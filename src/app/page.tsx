@@ -1,66 +1,186 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
 
-export default function Home() {
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/authStore';
+import { useThemeStore } from '@/store/themeStore';
+import { TEMPLATES } from '@/store/templateStore';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import styles from './home.module.css';
+
+export default function HomePage() {
+  const router = useRouter();
+  const { user, isAuthenticated, signOut } = useAuthStore();
+  const applyTemplate = useThemeStore((s) => s.applyTemplate);
+  const [showTemplates, setShowTemplates] = useState(false);
+
+  const handleTemplateSelect = (templateId: string) => {
+    const template = TEMPLATES.find((t) => t.id === templateId);
+    if (template) {
+      applyTemplate(JSON.parse(JSON.stringify(template.customization)));
+      setShowTemplates(false);
+      router.push('/editor');
+    }
+  };
+
+  const handleCustomCreate = () => {
+    router.push('/editor');
+  };
+
   return (
     <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+      <div className="mesh-gradient-bg" />
+
+      {/* ─── Navbar ─── */}
+      <nav className={styles.navbar}>
+        <div className={styles.navLogo}>
+          <div className={styles.navLogoIcon}>⚡</div>
+          <span className="gradient-text">Theme Studio</span>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className={styles.navRight}>
+          <ThemeToggle />
+          {isAuthenticated && user ? (
+            <div className={styles.userInfo}>
+              <div className={styles.userAvatar}>{user.avatar}</div>
+              <span className={styles.userName}>{user.name}</span>
+              <button className={styles.signOutBtn} onClick={signOut}>
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <button
+              className={styles.signInBtn}
+              onClick={() => router.push('/auth/signin')}
+            >
+              Sign In
+            </button>
+          )}
         </div>
-      </main>
+      </nav>
+
+      {/* ─── Hero ─── */}
+      <section className={styles.hero}>
+        <div className={styles.heroBadge}>✨ Power BI Theme Designer</div>
+        <h1 className={styles.heroTitle}>
+          Design Stunning
+          <br />
+          <span className="gradient-text">Power BI Themes</span>
+        </h1>
+        <p className={styles.heroSubtitle}>
+          Create professional theme configurations visually. Choose from curated
+          templates or build your own with live preview, then export as
+          Power BI-compatible JSON in one click.
+        </p>
+
+        {/* ─── CTA Cards ─── */}
+        <div className={styles.ctaGrid}>
+          <div
+            className={`${styles.ctaCard} ${styles.ctaTemplates} glass-card glass-card-hover`}
+            onClick={() => {
+              if (!isAuthenticated) {
+                router.push('/auth/signin');
+                return;
+              }
+              setShowTemplates(true);
+            }}
+            id="cta-templates"
+          >
+            <div className={styles.ctaIcon}>🎨</div>
+            <h2 className={styles.ctaTitle}>Browse Templates</h2>
+            <p className={styles.ctaDesc}>
+              Start from 8 professionally designed themes — corporate, dark mode,
+              analytics, sustainability, and more.
+            </p>
+            <div className={styles.ctaArrow}>
+              Explore Templates <span>→</span>
+            </div>
+          </div>
+
+          <div
+            className={`${styles.ctaCard} ${styles.ctaCustom} glass-card glass-card-hover`}
+            onClick={() => {
+              if (!isAuthenticated) {
+                router.push('/auth/signin');
+                return;
+              }
+              handleCustomCreate();
+            }}
+            id="cta-custom"
+          >
+            <div className={styles.ctaIcon}>🛠️</div>
+            <h2 className={styles.ctaTitle}>Create Custom Theme</h2>
+            <p className={styles.ctaDesc}>
+              Start from scratch with full control over colors, fonts, axes,
+              legends, and every visual property.
+            </p>
+            <div className={styles.ctaArrow}>
+              Open Editor <span>→</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Features ─── */}
+      <section className={styles.features}>
+        <p className={styles.featuresTitle}>Why Theme Studio</p>
+        <div className={styles.featuresGrid}>
+          {[
+            { emoji: '🎨', label: 'Visual Designer', desc: 'Intuitive UI — no manual JSON editing required' },
+            { emoji: '👁️', label: 'Live Preview', desc: '19 chart types rendered in real-time as you customize' },
+            { emoji: '📦', label: 'Pro Templates', desc: '8 industry-standard themes with best practices built in' },
+            { emoji: '⚡', label: 'One-Click Export', desc: 'Generate production-ready Power BI JSON theme files' },
+            { emoji: '🔄', label: 'Consistent Branding', desc: 'Apply your brand across the entire Power BI ecosystem' },
+            { emoji: '✅', label: 'JSON Validation', desc: 'Pre-export validation ensures your theme file is valid' },
+          ].map((f) => (
+            <div className={styles.featureItem} key={f.label}>
+              <span className={styles.featureEmoji}>{f.emoji}</span>
+              <div className={styles.featureLabel}>{f.label}</div>
+              <div className={styles.featureDesc}>{f.desc}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Template Gallery Modal ─── */}
+      {showTemplates && (
+        <div className={styles.modalOverlay} onClick={() => setShowTemplates(false)}>
+          <div
+            className={`${styles.modalContent} glass-card`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className={styles.modalClose} onClick={() => setShowTemplates(false)}>
+              ✕
+            </button>
+            <h2 className={styles.modalTitle}>Choose a Template</h2>
+            <p className={styles.modalSubtitle}>
+              Select a pre-designed theme to start with. You can customize every detail after.
+            </p>
+            <div className={styles.templateGrid}>
+              {TEMPLATES.map((t) => (
+                <div
+                  key={t.id}
+                  className={styles.templateCard}
+                  onClick={() => handleTemplateSelect(t.id)}
+                  id={`template-${t.id}`}
+                >
+                  <div className={styles.templateColorRow}>
+                    {t.previewColors.map((c, i) => (
+                      <div
+                        key={i}
+                        className={styles.templateColorSwatch}
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
+                  </div>
+                  <div className={styles.templateCategory}>{t.category}</div>
+                  <div className={styles.templateName}>{t.name}</div>
+                  <div className={styles.templateDesc}>{t.description}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,547 @@
+/* ─── Editor — Material You ─── */
+
+.editorLayout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── Sidebar ─── */
+.sidebar {
+  width: 360px;
+  min-width: 360px;
+  height: 100vh;
+  background: var(--md-surface-dim);
+  border-right: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideInLeft 0.35s ease-out;
+}
+
+.sidebarHeader {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebarLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.sidebarLogoIcon {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.sidebarHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.headerBtn {
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  transition: all var(--transition-fast);
+  color: var(--text-secondary);
+  background: transparent;
+}
+
+.headerBtn:hover {
+  color: var(--text-primary);
+  background: var(--md-surface-container);
+}
+
+.sidebarScroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+/* ─── Theme Name ─── */
+.themeNameSection {
+  padding: 12px 16px 16px;
+}
+
+.themeNameLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.themeNameInput {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--md-surface-container-low);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.themeNameInput:focus {
+  border-color: var(--md-primary);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* ─── Accordion Panel (M3 elevated cards) ─── */
+.panel {
+  margin: 4px 12px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.panelHeader {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  user-select: none;
+  border-radius: var(--radius-sm);
+}
+
+.panelHeader:hover {
+  background: var(--md-surface-container-low);
+}
+
+.panelHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.panelEmoji {
+  font-size: 18px;
+}
+
+.panelTitle {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.panelChevron {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  transition: transform var(--transition-fast);
+}
+
+.panelChevronOpen {
+  transform: rotate(180deg);
+}
+
+.panelBody {
+  padding: 4px 16px 16px;
+  animation: fadeIn 0.15s ease-out;
+}
+
+/* ─── Color Grid ─── */
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.colorSwatch {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.colorSwatch:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-md);
+}
+
+.colorSwatchActive {
+  border-color: var(--md-primary);
+  box-shadow: 0 0 0 2px var(--accent-glow-strong);
+}
+
+.colorSwatchIndex {
+  position: absolute;
+  bottom: 2px; right: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* ─── Color Picker Popover ─── */
+.colorPickerPopover {
+  position: absolute;
+  z-index: 50;
+  margin-top: 8px;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 0.12s ease-out;
+}
+
+.colorPickerPopover .react-colorful {
+  width: 220px !important;
+  height: 160px !important;
+}
+
+.colorHexInput {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-xs);
+  background: var(--md-surface-container-low);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: 'Google Sans Mono', 'Roboto Mono', monospace;
+  text-transform: uppercase;
+  transition: border-color var(--transition-fast);
+}
+
+.colorHexInput:focus {
+  border-color: var(--md-primary);
+}
+
+/* ─── Single Color Row ─── */
+.colorRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.colorRowLabel {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.colorRowSwatch {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  border: 2px solid var(--border-default);
+  transition: all var(--transition-fast);
+}
+
+.colorRowSwatch:hover {
+  border-color: var(--md-primary);
+  transform: scale(1.08);
+}
+
+/* ─── Font Customizer ─── */
+.fontRow {
+  margin-bottom: 16px;
+}
+
+.fontLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.fontSelect {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-xs);
+  background: var(--md-surface-container-low);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235f6368' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  transition: border-color var(--transition-fast);
+}
+
+.fontSelect:focus {
+  border-color: var(--md-primary);
+}
+
+.fontSelect option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--md-surface-container-high);
+  outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--md-primary);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.sliderValue {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  min-width: 28px;
+  text-align: center;
+}
+
+/* ─── Toggle Row (M3 Switch) ─── */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.toggleLabel {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.toggle {
+  width: 52px; height: 32px;
+  border-radius: 16px;
+  background: var(--md-surface-container-highest);
+  border: 2px solid var(--md-outline);
+  position: relative;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 6px; left: 6px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--md-outline);
+  transition: all var(--transition-base);
+}
+
+.toggleActive {
+  background: var(--md-primary);
+  border-color: var(--md-primary);
+}
+
+.toggleActive::after {
+  left: 26px;
+  width: 20px; height: 20px;
+  top: 4px;
+  background: var(--md-on-primary);
+}
+
+/* ─── Export Panel ─── */
+.exportSection {
+  padding: 16px;
+  border-top: 1px solid var(--border-default);
+}
+
+.exportBtn {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius-full);
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--transition-base);
+  border: none;
+}
+
+.exportBtn:hover {
+  box-shadow: var(--shadow-glow-strong);
+  opacity: 0.92;
+}
+
+.exportPreview {
+  margin-top: 12px;
+}
+
+.exportPreviewToggle {
+  font-size: 13px;
+  color: var(--md-primary);
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+  font-weight: 500;
+}
+
+.exportPreviewToggle:hover {
+  opacity: 0.8;
+}
+
+.exportPreviewCode {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: var(--radius-xs);
+  background: var(--md-surface-container-low);
+  border: 1px solid var(--border-default);
+  font-family: 'Google Sans Mono', 'Roboto Mono', monospace;
+  font-size: 11px;
+  color: var(--text-secondary);
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre;
+  line-height: 1.5;
+}
+
+/* ─── Preview Panel ─── */
+.mainPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.previewHeader {
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--md-surface-dim);
+}
+
+.previewHeaderTitle {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.chartChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ─── Chart Selector Chips (M3 Filter Chips) ─── */
+.chartChip {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--md-outline);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.chartChip:hover {
+  background: var(--md-surface-container-low);
+  color: var(--text-primary);
+}
+
+.chartChipActive {
+  background: var(--md-primary-container);
+  border-color: transparent;
+  color: var(--md-on-primary-container);
+  font-weight: 500;
+}
+
+.previewBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--md-surface-container-low);
+}
+
+.previewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 16px;
+}
+
+/* ─── Chart Cards (PBI tiles on M3 surface) ─── */
+.chartCard {
+  padding: 0;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.3s ease-out;
+  overflow: hidden;
+}
+
+.chartCardTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  padding: 14px 16px 0 16px;
+  font-family: 'Segoe UI', 'Google Sans Text', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.chartContainer {
+  width: 100%;
+  height: 260px;
+  padding: 8px 12px 12px 12px;
+}
+
+/* ─── Chart Selector Toggle Bar ─── */
+.chartSelectorBar {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--md-surface-dim);
+  overflow-x: auto;
+  display: flex;
+  gap: 8px;
+  scrollbar-width: none;
+}
+
+.chartSelectorBar::-webkit-scrollbar {
+  display: none;
+}

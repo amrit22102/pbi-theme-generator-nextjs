@@ -1,49 +1,356 @@
+/* ─── Power BI Theme Studio — Material You (M3) Design System ─── */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Text:wght@400;500;600;700&family=Product+Sans:wght@400;700&display=swap');
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ─ M3 Primary Tonal Palette ─ */
+  --md-primary: #1a73e8;
+  --md-on-primary: #ffffff;
+  --md-primary-container: #d3e3fd;
+  --md-on-primary-container: #062e6f;
+
+  /* ─ M3 Secondary ─ */
+  --md-secondary: #5f6368;
+  --md-on-secondary: #ffffff;
+  --md-secondary-container: #e8eaed;
+  --md-on-secondary-container: #3c4043;
+
+  /* ─ M3 Tertiary ─ */
+  --md-tertiary: #1e8e3e;
+  --md-tertiary-container: #ceead6;
+
+  /* ─ M3 Surface / Background ─ */
+  --md-surface: #ffffff;
+  --md-surface-dim: #f8f9fa;
+  --md-surface-bright: #ffffff;
+  --md-surface-container-lowest: #ffffff;
+  --md-surface-container-low: #f1f3f4;
+  --md-surface-container: #e8eaed;
+  --md-surface-container-high: #dadce0;
+  --md-surface-container-highest: #c4c7c5;
+  --md-surface-variant: #e8eaed;
+  --md-on-surface: #202124;
+  --md-on-surface-variant: #5f6368;
+  --md-outline: #dadce0;
+  --md-outline-variant: #e8eaed;
+
+  /* ─ M3 Error ─ */
+  --md-error: #d93025;
+  --md-error-container: #fce8e6;
+
+  /* ─ Design Tokens mapped ─ */
+  --bg-primary: var(--md-surface);
+  --bg-secondary: var(--md-surface-dim);
+  --bg-tertiary: var(--md-surface-container-low);
+  --bg-card: var(--md-surface);
+  --bg-card-solid: var(--md-surface);
+  --bg-card-hover: var(--md-surface-dim);
+  --bg-surface: var(--md-surface-container-low);
+  --bg-input: var(--md-surface);
+
+  --accent-primary: var(--md-primary);
+  --accent-primary-hover: #1765cc;
+  --accent-secondary: var(--md-tertiary);
+  --accent-secondary-hover: #1a7d36;
+  --accent-gradient: linear-gradient(135deg, #1a73e8 0%, #8ab4f8 100%);
+  --accent-glow: rgba(26, 115, 232, 0.08);
+  --accent-glow-strong: rgba(26, 115, 232, 0.16);
+
+  --text-primary: var(--md-on-surface);
+  --text-secondary: var(--md-on-surface-variant);
+  --text-tertiary: #9aa0a6;
+  --text-accent: var(--md-primary);
+  --text-on-accent: var(--md-on-primary);
+
+  --border-subtle: transparent;
+  --border-default: var(--md-outline-variant);
+  --border-hover: var(--md-outline);
+  --border-accent: rgba(26, 115, 232, 0.3);
+
+  /* ─ M3 Shape Scale ─ */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 28px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* ─ M3 Elevation (light mode) ─ */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-glow: 0 1px 8px rgba(26, 115, 232, 0.08);
+  --shadow-glow-strong: 0 2px 16px rgba(26, 115, 232, 0.16);
+
+  /* ─ Transitions ─ */
+  --transition-fast: 150ms cubic-bezier(0.2, 0, 0, 1);
+  --transition-base: 250ms cubic-bezier(0.2, 0, 0, 1);
+  --transition-slow: 400ms cubic-bezier(0.2, 0, 0, 1);
+
+  /* ─ Typography ─ */
+  --font-sans: 'Google Sans Text', 'Google Sans', 'Product Sans', 'Inter', -apple-system, Roboto, sans-serif;
+  --font-display: 'Google Sans', 'Product Sans', 'Inter', sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Dark Theme (M3 Dark Scheme) ─── */
+.dark {
+  --md-primary: #8ab4f8;
+  --md-on-primary: #062e6f;
+  --md-primary-container: #174ea6;
+  --md-on-primary-container: #d3e3fd;
+
+  --md-secondary: #9aa0a6;
+  --md-on-secondary: #202124;
+  --md-secondary-container: #3c4043;
+  --md-on-secondary-container: #e8eaed;
+
+  --md-tertiary: #81c995;
+  --md-tertiary-container: #137333;
+
+  --md-surface: #1f1f1f;
+  --md-surface-dim: #141414;
+  --md-surface-bright: #2d2d2d;
+  --md-surface-container-lowest: #0e0e0e;
+  --md-surface-container-low: #1a1a1a;
+  --md-surface-container: #252525;
+  --md-surface-container-high: #303030;
+  --md-surface-container-highest: #3c3c3c;
+  --md-surface-variant: #303030;
+  --md-on-surface: #e3e3e3;
+  --md-on-surface-variant: #9aa0a6;
+  --md-outline: #5f6368;
+  --md-outline-variant: #3c4043;
+
+  --md-error: #f28b82;
+  --md-error-container: #8c1d18;
+
+  --bg-primary: var(--md-surface);
+  --bg-secondary: var(--md-surface-dim);
+  --bg-tertiary: var(--md-surface-container-low);
+  --bg-card: var(--md-surface-container-low);
+  --bg-card-solid: var(--md-surface-container);
+  --bg-card-hover: var(--md-surface-container);
+  --bg-surface: var(--md-surface-container-low);
+  --bg-input: var(--md-surface-container);
+
+  --accent-primary: var(--md-primary);
+  --accent-primary-hover: #aecbfa;
+  --accent-secondary: var(--md-tertiary);
+  --accent-gradient: linear-gradient(135deg, #8ab4f8 0%, #4285f4 100%);
+  --accent-glow: rgba(138, 180, 248, 0.1);
+  --accent-glow-strong: rgba(138, 180, 248, 0.2);
+
+  --text-primary: var(--md-on-surface);
+  --text-secondary: var(--md-on-surface-variant);
+  --text-tertiary: #5f6368;
+  --text-accent: var(--md-primary);
+  --text-on-accent: var(--md-on-primary);
+
+  --border-subtle: transparent;
+  --border-default: var(--md-outline-variant);
+  --border-hover: var(--md-outline);
+  --border-accent: rgba(138, 180, 248, 0.3);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 1px 8px rgba(138, 180, 248, 0.1);
+  --shadow-glow-strong: 0 2px 16px rgba(138, 180, 248, 0.2);
+}
+
+/* ─── Reset ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
-  height: 100%;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color var(--transition-slow), color var(--transition-slow);
 }
 
-a {
+/* ─── Scrollbar (M3 style — thin, tonal) ─── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--md-outline);
+  border-radius: var(--radius-full);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--md-on-surface-variant); }
+
+::selection {
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+}
+
+a { color: inherit; text-decoration: none; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
   color: inherit;
-  text-decoration: none;
+  font-size: inherit;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+/* ─── M3 Utility Classes ─── */
+
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.glass-card-hover {
+  transition: all var(--transition-base);
+}
+
+.glass-card-hover:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.accent-border {
+  border: 1px solid var(--border-accent);
+  box-shadow: var(--shadow-glow);
+}
+
+.gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── M3 Theme Toggle (Pill) ─── */
+.themeToggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  transition: all var(--transition-fast);
+}
+
+.themeToggleBtn:hover {
+  color: var(--text-primary);
+  background: var(--md-surface-container);
+}
+
+/* ─── Animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 12px rgba(26, 115, 232, 0.08); }
+  50% { box-shadow: 0 0 24px rgba(26, 115, 232, 0.16); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-fadeIn { animation: fadeIn 0.4s var(--transition-base) forwards; }
+.animate-slideInLeft { animation: slideInLeft 0.35s var(--transition-base) forwards; }
+.animate-slideInRight { animation: slideInRight 0.35s var(--transition-base) forwards; }
+
+/* ─── Subtle background surface ─── */
+.mesh-gradient-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+.mesh-gradient-bg::before {
+  content: '';
+  position: absolute;
+  top: -30%; left: -30%;
+  width: 160%; height: 160%;
+  background:
+    radial-gradient(ellipse at 25% 40%, var(--md-primary-container) 0%, transparent 50%);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* ─── Toast (M3 Snackbar) ─── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 14px 24px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: fadeIn 0.2s ease-out;
+  background: var(--md-on-surface);
+  color: var(--md-surface);
+  box-shadow: var(--shadow-lg);
+  border: none;
+}
+
+.toast-success {
+  background: var(--md-on-surface);
+  border-left: none;
+}
+
+.toast-error {
+  background: var(--md-error);
+  color: #ffffff;
+  border-left: none;
 }

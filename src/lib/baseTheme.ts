@@ -56,6 +56,28 @@ export const DEFAULT_CUSTOMIZATION: ThemeCustomization = {
     fontSize: 10,
     fontColor: '#252423',
   },
+  textClasses: {
+    callout: {
+      fontSize: 24,
+      fontFace: 'DIN',
+      color: '#252423',
+    },
+    title: {
+      fontSize: 12,
+      fontFace: 'DIN',
+      color: '#252423',
+    },
+    header: {
+      fontSize: 12,
+      fontFace: 'Segoe UI Semibold',
+      color: '#252423',
+    },
+    label: {
+      fontSize: 10,
+      fontFace: 'Segoe UI',
+      color: '#252423',
+    },
+  },
   xAxis: {
     show: true,
     showAxisTitle: true,
@@ -74,6 +96,100 @@ export const DEFAULT_CUSTOMIZATION: ThemeCustomization = {
     show: true,
     position: 'RightCenter',
     fontSize: 10,
+  },
+  visualCustomizations: {
+    scatterPlot: {
+      bubbleSize: -10,
+      markerRangeType: 'auto',
+      fillPoint: true,
+      showLegend: true,
+      legendPosition: 'RightCenter',
+    },
+    lineChart: {
+      responsive: true,
+      matchSeriesInterpolation: true,
+      showLegend: true,
+      legendPosition: 'RightCenter',
+    },
+    pieChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+      labelStyle: 'Data value, percent of total',
+    },
+    donutChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+      labelStyle: 'Data value, percent of total',
+    },
+    columnChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+      responsive: true,
+      showGradientLegend: true,
+    },
+    clusteredColumnChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+      responsive: true,
+    },
+    barChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+      responsive: true,
+    },
+    clusteredBarChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+      responsive: true,
+    },
+    areaChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+      responsive: true,
+    },
+    stackedAreaChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+      responsive: true,
+    },
+    waterfallChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+      responsive: true,
+    },
+    ribbonChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+    },
+    treemapChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+    },
+    funnelChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+    },
+    gaugeChart: {
+      showLegend: true,
+      legendPosition: 'RightCenter',
+    },
+    kpiCard: {
+      trendlineTransparency: 20,
+    },
+    cardVisual: {
+      maxTiles: 3,
+      cellPadding: 12,
+      backgroundShow: true,
+    },
+    matrixTable: {
+      showExpandCollapseButtons: true,
+      legacyStyleDisabled: true,
+    },
+    slicerVisual: {
+      responsive: true,
+      hideDatePickerButton: false,
+      itemPadding: 4,
+    },
   },
 };
 
@@ -109,10 +225,10 @@ export function buildExportJSON(customization: ThemeCustomization, selectedChart
     hyperlink: '#0078d4',
     visitedHyperlink: '#0078d4',
     textClasses: {
-      callout: { fontSize: 24, fontFace: customization.font.fontFamily === 'Segoe UI' ? 'DIN' : customization.font.fontFamily, color: customization.font.fontColor },
-      title: { fontSize: 12, fontFace: customization.font.fontFamily === 'Segoe UI' ? 'DIN' : customization.font.fontFamily, color: customization.font.fontColor },
-      header: { fontSize: 12, fontFace: customization.font.fontFamily === 'Segoe UI' ? 'Segoe UI Semibold' : customization.font.fontFamily, color: customization.font.fontColor },
-      label: { fontSize: customization.font.fontSize, fontFace: customization.font.fontFamily, color: customization.font.fontColor },
+      callout: customization.textClasses.callout,
+      title: customization.textClasses.title,
+      header: customization.textClasses.header,
+      label: customization.textClasses.label,
     },
     visualStyles: buildVisualStyles(customization, selectedCharts),
   };
@@ -197,6 +313,76 @@ function buildVisualStyles(customization: ThemeCustomization, selectedCharts: Ch
     },
   };
 
+  /* Merge per-visual appearance overrides (primaryColor, secondaryColor, fontSize, fontFamily, fontColor)
+     into each visual's style sections when the user has customized them */
+  for (const chart of selectedCharts) {
+    const visualConfig = customization.visualCustomizations[chart];
+    if (!visualConfig) continue;
+
+    const { primaryColor, secondaryColor, fontSize, fontFamily, fontColor } = visualConfig as {
+      primaryColor?: string;
+      secondaryColor?: string;
+      fontSize?: number;
+      fontFamily?: string;
+      fontColor?: string;
+    };
+
+    const hasAppearanceOverride = primaryColor || secondaryColor || fontSize || fontFamily || fontColor;
+    if (!hasAppearanceOverride) continue;
+
+    const pbiKeys = CHART_TO_VISUAL_KEYS[chart];
+    if (!pbiKeys) continue;
+
+    for (const pbiKey of pbiKeys) {
+      // Get or create the visual style entry
+      const existingStyle = allVisualStyles[pbiKey] as { '*': Record<string, unknown[]> } | undefined;
+      const starSection: Record<string, unknown[]> = existingStyle ? { ...existingStyle['*'] } : {};
+
+      // Inject data point colors
+      if (primaryColor || secondaryColor) {
+        const dataPointOverrides: Record<string, unknown> = {};
+        if (primaryColor) {
+          dataPointOverrides.fill = { solid: { color: primaryColor } };
+        }
+        if (secondaryColor) {
+          dataPointOverrides.fill2 = { solid: { color: secondaryColor } };
+        }
+        starSection.dataPoint = [dataPointOverrides];
+      }
+
+      // Inject font overrides into labels section
+      if (fontSize || fontFamily || fontColor) {
+        const labelOverrides: Record<string, unknown> = {};
+        if (fontSize) labelOverrides.fontSize = fontSize;
+        if (fontFamily) labelOverrides.fontFamily = fontFamily;
+        if (fontColor) labelOverrides.color = { solid: { color: fontColor } };
+
+        // Merge with existing labels if present
+        const existingLabels = starSection.labels;
+        if (existingLabels && Array.isArray(existingLabels) && existingLabels.length > 0) {
+          starSection.labels = [{ ...(existingLabels[0] as object), ...labelOverrides }];
+        } else {
+          starSection.labels = [labelOverrides];
+        }
+
+        // Also apply to title section for font settings
+        const titleOverrides: Record<string, unknown> = {};
+        if (fontFamily) titleOverrides.fontFamily = fontFamily;
+        if (fontColor) titleOverrides.color = { solid: { color: fontColor } };
+        if (fontSize) titleOverrides.fontSize = fontSize;
+
+        const existingTitle = starSection.title;
+        if (existingTitle && Array.isArray(existingTitle) && existingTitle.length > 0) {
+          starSection.title = [{ ...(existingTitle[0] as object), ...titleOverrides }];
+        } else {
+          starSection.title = [titleOverrides];
+        }
+      }
+
+      allVisualStyles[pbiKey] = { '*': starSection };
+    }
+  }
+
   for (const key of selectedVisualKeys) {
     if (allVisualStyles[key]) {
       result[key] = allVisualStyles[key];
@@ -209,3 +395,4 @@ function buildVisualStyles(customization: ThemeCustomization, selectedCharts: Ch
 
   return result;
 }
+

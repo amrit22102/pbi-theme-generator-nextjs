@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
 import { useThemeStore } from '@/store/themeStore';
 import { TEMPLATES } from '@/store/templateStore';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -10,7 +9,6 @@ import styles from './home.module.css';
 
 export default function HomePage() {
   const router = useRouter();
-  const { user, isAuthenticated, signOut } = useAuthStore();
   const applyTemplate = useThemeStore((s) => s.applyTemplate);
   const [showTemplates, setShowTemplates] = useState(false);
 
@@ -39,22 +37,6 @@ export default function HomePage() {
         </div>
         <div className={styles.navRight}>
           <ThemeToggle />
-          {isAuthenticated && user ? (
-            <div className={styles.userInfo}>
-              <div className={styles.userAvatar}>{user.avatar}</div>
-              <span className={styles.userName}>{user.name}</span>
-              <button className={styles.signOutBtn} onClick={signOut}>
-                Sign Out
-              </button>
-            </div>
-          ) : (
-            <button
-              className={styles.signInBtn}
-              onClick={() => router.push('/auth/signin')}
-            >
-              Sign In
-            </button>
-          )}
         </div>
       </nav>
 
@@ -77,10 +59,6 @@ export default function HomePage() {
           <div
             className={`${styles.ctaCard} ${styles.ctaTemplates} glass-card glass-card-hover`}
             onClick={() => {
-              if (!isAuthenticated) {
-                router.push('/auth/signin');
-                return;
-              }
               setShowTemplates(true);
             }}
             id="cta-templates"
@@ -99,10 +77,6 @@ export default function HomePage() {
           <div
             className={`${styles.ctaCard} ${styles.ctaCustom} glass-card glass-card-hover`}
             onClick={() => {
-              if (!isAuthenticated) {
-                router.push('/auth/signin');
-                return;
-              }
               handleCustomCreate();
             }}
             id="cta-custom"
@@ -163,15 +137,42 @@ export default function HomePage() {
                   onClick={() => handleTemplateSelect(t.id)}
                   id={`template-${t.id}`}
                 >
-                  <div className={styles.templateColorRow}>
-                    {t.previewColors.map((c, i) => (
+                  {/* Full data color palette bar */}
+                  <div className={styles.paletteBar}>
+                    {t.customization.colors.dataColors.map((c, i) => (
                       <div
                         key={i}
-                        className={styles.templateColorSwatch}
+                        className={styles.paletteSegment}
                         style={{ backgroundColor: c }}
                       />
                     ))}
                   </div>
+
+                  {/* Semantic colors row */}
+                  <div className={styles.semanticRow}>
+                    <div className={styles.semanticChip}>
+                      <span
+                        className={styles.semanticDot}
+                        style={{ backgroundColor: t.customization.colors.good }}
+                      />
+                      Good
+                    </div>
+                    <div className={styles.semanticChip}>
+                      <span
+                        className={styles.semanticDot}
+                        style={{ backgroundColor: t.customization.colors.neutral }}
+                      />
+                      Neutral
+                    </div>
+                    <div className={styles.semanticChip}>
+                      <span
+                        className={styles.semanticDot}
+                        style={{ backgroundColor: t.customization.colors.bad }}
+                      />
+                      Bad
+                    </div>
+                  </div>
+
                   <div className={styles.templateCategory}>{t.category}</div>
                   <div className={styles.templateName}>{t.name}</div>
                   <div className={styles.templateDesc}>{t.description}</div>

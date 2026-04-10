@@ -1,12 +1,12 @@
 'use client';
 
 import { create } from 'zustand';
-import { ThemeCustomization, AxisConfig, LegendConfig, ChartType } from '@/types/theme';
+import { ThemeCustomization, AxisConfig, LegendConfig, ChartType, TextClass, VisualConfig } from '@/types/theme';
 import { DEFAULT_CUSTOMIZATION, buildExportJSON } from '@/lib/baseTheme';
 
 interface ThemeState {
   customization: ThemeCustomization;
-  selectedCharts: ChartType[];
+  selectedVisual: ChartType | null;
 
   // Actions
   setThemeName: (name: string) => void;
@@ -15,29 +15,25 @@ interface ThemeState {
   setForeground: (color: string) => void;
   setForegroundSecondary: (color: string) => void;
   setForegroundTertiary: (color: string) => void;
+  setBackground: (color: string) => void;
+  setPrimaryDataColor: (color: string) => void;
   setStatusColor: (type: 'good' | 'neutral' | 'bad', color: string) => void;
   setAccentColor: (type: 'tableAccent' | 'maximum' | 'center' | 'minimum', color: string) => void;
   setFont: (font: Partial<ThemeCustomization['font']>) => void;
+  setTextClass: (textClass: 'callout' | 'title' | 'header' | 'label', config: Partial<TextClass>) => void;
+  setVisualConfig: (visual: ChartType, config: Partial<VisualConfig>) => void;
   setXAxis: (config: Partial<AxisConfig>) => void;
   setYAxis: (config: Partial<AxisConfig>) => void;
   setLegend: (config: Partial<LegendConfig>) => void;
+  selectVisual: (visual: ChartType | null) => void;
   applyTemplate: (customization: ThemeCustomization) => void;
   resetToDefault: () => void;
-  toggleChart: (chart: ChartType) => void;
-  setSelectedCharts: (charts: ChartType[]) => void;
   getExportJSON: () => object;
 }
 
 export const useThemeStore = create<ThemeState>((set, get) => ({
   customization: { ...DEFAULT_CUSTOMIZATION },
-  selectedCharts: [
-    'columnChart',
-    'lineChart',
-    'pieChart',
-    'barChart',
-    'donutChart',
-    'kpiCard',
-  ],
+  selectedVisual: null,
 
   setThemeName: (name) =>
     set((s) => ({ customization: { ...s.customization, name } })),
@@ -86,6 +82,26 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       },
     })),
 
+  setBackground: (color) =>
+    set((s) => ({
+      customization: {
+        ...s.customization,
+        colors: { ...s.customization.colors, background: color },
+      },
+    })),
+
+  setPrimaryDataColor: (color) =>
+    set((s) => {
+      const newColors = [...s.customization.colors.dataColors];
+      newColors[0] = color;
+      return {
+        customization: {
+          ...s.customization,
+          colors: { ...s.customization.colors, dataColors: newColors },
+        },
+      };
+    }),
+
   setStatusColor: (type, color) =>
     set((s) => ({
       customization: {
@@ -107,6 +123,28 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       customization: {
         ...s.customization,
         font: { ...s.customization.font, ...font },
+      },
+    })),
+
+  setTextClass: (textClass, config) =>
+    set((s) => ({
+      customization: {
+        ...s.customization,
+        textClasses: {
+          ...s.customization.textClasses,
+          [textClass]: { ...s.customization.textClasses[textClass], ...config },
+        },
+      },
+    })),
+
+  setVisualConfig: (visual, config) =>
+    set((s) => ({
+      customization: {
+        ...s.customization,
+        visualCustomizations: {
+          ...s.customization.visualCustomizations,
+          [visual]: { ...s.customization.visualCustomizations[visual], ...config },
+        },
       },
     })),
 
@@ -134,22 +172,35 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       },
     })),
 
+  selectVisual: (visual) => set({ selectedVisual: visual }),
+
   applyTemplate: (customization) => set({ customization }),
 
   resetToDefault: () =>
     set({ customization: JSON.parse(JSON.stringify(DEFAULT_CUSTOMIZATION)) }),
 
-  toggleChart: (chart) =>
-    set((s) => {
-      const idx = s.selectedCharts.indexOf(chart);
-      if (idx >= 0) {
-        return { selectedCharts: s.selectedCharts.filter((c) => c !== chart) };
-      }
-      if (s.selectedCharts.length >= 10) return s;
-      return { selectedCharts: [...s.selectedCharts, chart] };
-    }),
-
-  setSelectedCharts: (charts) => set({ selectedCharts: charts }),
-
-  getExportJSON: () => buildExportJSON(get().customization, get().selectedCharts),
+  getExportJSON: () => {
+    const allCharts: ChartType[] = [
+      'columnChart',
+      'clusteredColumnChart',
+      'barChart',
+      'clusteredBarChart',
+      'lineChart',
+      'areaChart',
+      'stackedAreaChart',
+      'pieChart',
+      'donutChart',
+      'scatterPlot',
+      'kpiCard',
+      'cardVisual',
+      'matrixTable',
+      'slicerVisual',
+      'waterfallChart',
+      'ribbonChart',
+      'treemapChart',
+      'funnelChart',
+      'gaugeChart',
+    ];
+    return buildExportJSON(get().customization, allCharts);
+  },
 }));

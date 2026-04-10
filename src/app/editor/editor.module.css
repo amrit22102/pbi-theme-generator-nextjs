@@ -438,7 +438,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
   background: var(--bg-primary);
 }
 
@@ -544,4 +544,12 @@
 
 .chartSelectorBar::-webkit-scrollbar {
   display: none;
+}
+
+/* ─── Visual Customization Scroll Container ─── */
+.visualCustomizationScroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 20px;
+  width: 100%;
 }

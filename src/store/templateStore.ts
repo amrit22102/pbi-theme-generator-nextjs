@@ -234,4 +234,52 @@ export const TEMPLATES: TemplateTheme[] = [
       font: { fontFamily: 'Verdana', fontSize: 10, fontColor: '#0A2239' },
     }
   ),
+
+  makeTemplate(
+    'kelloggs',
+    "Kellogg's Theme",
+    'Professional theme with extended color palette for enterprise dashboards.',
+    'Enterprise',
+    {
+      colors: {
+        dataColors: ["#118DFF", "#12239E", "#E66C37", "#6B007B", "#E044A7", "#744EC2", "#D9B300", "#D64550", "#197278", "#1AAB40", "#15C6F4", "#4092FF", "#FFA058", "#BE5DC9", "#F472D0", "#B5A1FF", "#C4A200", "#FF8080", "#00DBBC", "#5BD667", "#0091D5", "#4668C5", "#FF6300", "#99008A", "#EC008C", "#533285", "#99700A", "#FF4141", "#1F9A85", "#25891C", "#0057A2", "#002050", "#C94F0F", "#450F54", "#B60064", "#34124F", "#6A5A29", "#1AAB40", "#BA141A", "#0C3D37", "#0B511F"],
+        foreground: "#252423",
+        foregroundNeutralSecondary: "#605E5C",
+        foregroundNeutralTertiary: "#B3B0AD",
+        background: "#FFFFFF",
+        backgroundLight: "#F3F2F1",
+        backgroundNeutral: "#C8C6C4",
+        tableAccent: "#118DFF",
+        good: "#1AAB40",
+        neutral: "#D9B300",
+        bad: "#D64554",
+        maximum: "#118DFF",
+        center: "#D9B300",
+        minimum: "#DEEFFF",
+      },
+      textClasses: {
+        callout: {
+          fontSize: 45,
+          fontFace: "DIN",
+          color: "#252423"
+        },
+        title: {
+          fontSize: 12,
+          fontFace: "DIN",
+          color: "#252423"
+        },
+        header: {
+          fontSize: 12,
+          fontFace: "Segoe UI Semibold",
+          color: "#252423"
+        },
+        label: {
+          fontSize: 10,
+          fontFace: "Segoe UI",
+          color: "#252423"
+        }
+      },
+      font: { fontFamily: 'Segoe UI', fontSize: 10, fontColor: '#252423' },
+    }
+  ),
 ];

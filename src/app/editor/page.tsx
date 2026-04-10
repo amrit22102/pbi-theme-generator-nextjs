@@ -1,64 +1,19 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { HexColorPicker } from 'react-colorful';
 import { useThemeStore } from '@/store/themeStore';
-import { useAuthStore } from '@/store/authStore';
 import { exportThemeJSON } from '@/lib/themeExporter';
 import {
   ChartType,
   CHART_TYPE_LABELS,
   FONT_FAMILIES,
-  GRIDLINE_STYLES,
-  LEGEND_POSITIONS,
 } from '@/types/theme';
-import ColumnChartPreview from '@/components/charts/ColumnChart';
-import ClusteredColumnPreview from '@/components/charts/ClusteredColumnChart';
-import BarChartPreview from '@/components/charts/BarChart';
-import ClusteredBarPreview from '@/components/charts/ClusteredBarChart';
-import LineChartPreview from '@/components/charts/LineChart';
-import AreaChartPreview from '@/components/charts/AreaChart';
-import StackedAreaPreview from '@/components/charts/StackedAreaChart';
-import PieChartPreview from '@/components/charts/PieChart';
-import DonutChartPreview from '@/components/charts/DonutChart';
-import ScatterPlotPreview from '@/components/charts/ScatterPlot';
-import KpiCardPreview from '@/components/charts/KpiCard';
-import CardVisualPreview from '@/components/charts/CardVisual';
-import MatrixTablePreview from '@/components/charts/MatrixTable';
-import SlicerVisualPreview from '@/components/charts/SlicerVisual';
-import WaterfallPreview from '@/components/charts/WaterfallChart';
-import RibbonChartPreview from '@/components/charts/RibbonChart';
-import TreemapPreview from '@/components/charts/TreemapChart';
-import FunnelPreview from '@/components/charts/FunnelChart';
-import GaugePreview from '@/components/charts/GaugeChart';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import styles from './editor.module.css';
 
-/* ─── Chart component map ─── */
-const CHART_COMPONENTS: Record<ChartType, React.FC> = {
-  columnChart: ColumnChartPreview,
-  clusteredColumnChart: ClusteredColumnPreview,
-  barChart: BarChartPreview,
-  clusteredBarChart: ClusteredBarPreview,
-  lineChart: LineChartPreview,
-  areaChart: AreaChartPreview,
-  stackedAreaChart: StackedAreaPreview,
-  pieChart: PieChartPreview,
-  donutChart: DonutChartPreview,
-  scatterPlot: ScatterPlotPreview,
-  kpiCard: KpiCardPreview,
-  cardVisual: CardVisualPreview,
-  matrixTable: MatrixTablePreview,
-  slicerVisual: SlicerVisualPreview,
-  waterfallChart: WaterfallPreview,
-  ribbonChart: RibbonChartPreview,
-  treemapChart: TreemapPreview,
-  funnelChart: FunnelPreview,
-  gaugeChart: GaugePreview,
-};
-
-/* ─── Color picker with fixed-position popover ─── */
+/* ─── Color Picker Field ─── */
 function ColorPickerField({
   color,
   onChange,
@@ -75,10 +30,8 @@ function ColorPickerField({
   const handleOpen = () => {
     if (!open && swatchRef.current) {
       const rect = swatchRef.current.getBoundingClientRect();
-      // Position the picker to the left of the swatch, below it
       let top = rect.bottom + 8;
-      let left = rect.right - 252; // 220px picker + 32px padding roughly
-      // Clamp so it doesn't go off-screen
+      let left = rect.right - 252;
       if (left < 8) left = 8;
       if (top + 240 > window.innerHeight) top = rect.top - 248;
       setPos({ top, left });
@@ -155,27 +108,20 @@ function Panel({
 /* ─── Main Editor Page ─── */
 export default function EditorPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
   const {
     customization,
-    selectedCharts,
+    selectedVisual,
     setThemeName,
-    setDataColor,
     setForeground,
-    setForegroundSecondary,
-    setForegroundTertiary,
-    setStatusColor,
-    setAccentColor,
-    setFont,
-    setXAxis,
-    setYAxis,
-    setLegend,
-    toggleChart,
+    setBackground,
+    setPrimaryDataColor,
+    setTextClass,
+    setVisualConfig,
+    selectVisual,
     resetToDefault,
     getExportJSON,
   } = useThemeStore();
 
-  const [activeColorIdx, setActiveColorIdx] = useState<number | null>(null);
   const [showExportPreview, setShowExportPreview] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
 
@@ -194,17 +140,31 @@ export default function EditorPage() {
     }
   };
 
-  // Redirect to sign-in if not authenticated
-  if (!isAuthenticated) {
-    if (typeof window !== 'undefined') {
-      router.push('/auth/signin');
-    }
-    return null;
-  }
+  const allCharts: ChartType[] = [
+    'columnChart',
+    'clusteredColumnChart',
+    'barChart',
+    'clusteredBarChart',
+    'lineChart',
+    'areaChart',
+    'stackedAreaChart',
+    'pieChart',
+    'donutChart',
+    'scatterPlot',
+    'kpiCard',
+    'cardVisual',
+    'matrixTable',
+    'slicerVisual',
+    'waterfallChart',
+    'ribbonChart',
+    'treemapChart',
+    'funnelChart',
+    'gaugeChart',
+  ];
 
   return (
     <div className={styles.editorLayout}>
-      {/* ─── Sidebar ─── */}
+      {/* ─── Sidebar: Global Customizations Only ─── */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <div className={styles.sidebarLogo} onClick={() => router.push('/')}>
@@ -232,249 +192,205 @@ export default function EditorPage() {
         </div>
 
         <div className={styles.sidebarScroll}>
-          {/* ─── Data Colors ─── */}
-          <Panel emoji="🎨" title="Data Colors (10)" defaultOpen>
-            <div className={styles.colorGrid}>
-              {customization.colors.dataColors.map((c, i) => (
-                <div
-                  key={i}
-                  className={`${styles.colorSwatch} ${activeColorIdx === i ? styles.colorSwatchActive : ''}`}
-                  style={{ backgroundColor: c }}
-                  onClick={() => setActiveColorIdx(activeColorIdx === i ? null : i)}
-                >
-                  <span className={styles.colorSwatchIndex}>{i + 1}</span>
-                </div>
-              ))}
-            </div>
-            {activeColorIdx !== null && (
-              <div style={{ marginTop: 12 }}>
-                <HexColorPicker
-                  color={customization.colors.dataColors[activeColorIdx]}
-                  onChange={(c) => setDataColor(activeColorIdx, c)}
-                />
-                <input
-                  className={styles.colorHexInput}
-                  value={customization.colors.dataColors[activeColorIdx]}
-                  onChange={(e) => {
-                    if (/^#[0-9A-Fa-f]{0,6}$/.test(e.target.value))
-                      setDataColor(activeColorIdx, e.target.value);
-                  }}
-                  style={{ marginTop: 8 }}
-                />
-              </div>
-            )}
-          </Panel>
-
-          {/* ─── Foreground Colors ─── */}
-          <Panel emoji="🔤" title="Foreground Colors">
+          {/* ─── Global Customizations ─── */}
+          <Panel emoji="🌍" title="Global Customizations" defaultOpen>
+            {/* Primary Data Color */}
             <ColorPickerField
-              label="Primary Text"
+              label="Primary Data Color"
+              color={customization.colors.dataColors[0]}
+              onChange={setPrimaryDataColor}
+            />
+
+            {/* Background Color */}
+            <ColorPickerField
+              label="Background Color"
+              color={customization.colors.background}
+              onChange={setBackground}
+            />
+
+            {/* Foreground/Text Color */}
+            <ColorPickerField
+              label="Foreground Color"
               color={customization.colors.foreground}
               onChange={setForeground}
             />
-            <ColorPickerField
-              label="Secondary Text"
-              color={customization.colors.foregroundNeutralSecondary}
-              onChange={setForegroundSecondary}
-            />
-            <ColorPickerField
-              label="Tertiary Text"
-              color={customization.colors.foregroundNeutralTertiary}
-              onChange={setForegroundTertiary}
-            />
-          </Panel>
 
-          {/* ─── Status Colors ─── */}
-          <Panel emoji="🚦" title="Status Colors">
-            <ColorPickerField
-              label="Good"
-              color={customization.colors.good}
-              onChange={(c) => setStatusColor('good', c)}
-            />
-            <ColorPickerField
-              label="Neutral"
-              color={customization.colors.neutral}
-              onChange={(c) => setStatusColor('neutral', c)}
-            />
-            <ColorPickerField
-              label="Bad"
-              color={customization.colors.bad}
-              onChange={(c) => setStatusColor('bad', c)}
-            />
-          </Panel>
+            {/* Text Classes */}
+            <div style={{ marginTop: 16, borderTop: '1px solid var(--border-color)', paddingTop: 12 }}>
+              <h4 style={{ fontSize: 21, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>
+                Text Classes
+              </h4>
 
-          {/* ─── Accent Colors ─── */}
-          <Panel emoji="✨" title="Accent Colors">
-            <ColorPickerField
-              label="Table Accent"
-              color={customization.colors.tableAccent}
-              onChange={(c) => setAccentColor('tableAccent', c)}
-            />
-            <ColorPickerField
-              label="Maximum"
-              color={customization.colors.maximum}
-              onChange={(c) => setAccentColor('maximum', c)}
-            />
-            <ColorPickerField
-              label="Center"
-              color={customization.colors.center}
-              onChange={(c) => setAccentColor('center', c)}
-            />
-            <ColorPickerField
-              label="Minimum"
-              color={customization.colors.minimum}
-              onChange={(c) => setAccentColor('minimum', c)}
-            />
-          </Panel>
-
-          {/* ─── Typography ─── */}
-          <Panel emoji="🔠" title="Typography">
-            <div className={styles.fontRow}>
-              <div className={styles.fontLabel}>Font Family</div>
-              <select
-                className={styles.fontSelect}
-                value={customization.font.fontFamily}
-                onChange={(e) => setFont({ fontFamily: e.target.value })}
-                id="font-family-select"
-              >
-                {FONT_FAMILIES.map((f) => (
-                  <option key={f} value={f}>{f}</option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.fontRow}>
-              <div className={styles.fontLabel}>Font Size ({customization.font.fontSize}pt)</div>
-              <div className={styles.sliderRow}>
-                <span className={styles.sliderValue}>7</span>
-                <input
-                  type="range"
-                  className={styles.slider}
-                  min={7}
-                  max={20}
-                  value={customization.font.fontSize}
-                  onChange={(e) => setFont({ fontSize: Number(e.target.value) })}
-                  id="font-size-slider"
+              {/* Callout */}
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>
+                  Callout
+                </div>
+                <div className={styles.fontRow}>
+                  <div className={styles.fontLabel}>Font Size ({customization.textClasses.callout.fontSize}pt)</div>
+                  <div className={styles.sliderRow}>
+                    <span className={styles.sliderValue}>14</span>
+                    <input
+                      type="range"
+                      className={styles.slider}
+                      min={14}
+                      max={32}
+                      value={customization.textClasses.callout.fontSize}
+                      onChange={(e) =>
+                        setTextClass('callout', { fontSize: Number(e.target.value) })
+                      }
+                    />
+                    <span className={styles.sliderValue}>32</span>
+                  </div>
+                </div>
+                <div className={styles.fontRow}>
+                  <div className={styles.fontLabel}>Font Family</div>
+                  <select
+                    className={styles.fontSelect}
+                    value={customization.textClasses.callout.fontFace}
+                    onChange={(e) =>
+                      setTextClass('callout', { fontFace: e.target.value })
+                    }
+                  >
+                    {FONT_FAMILIES.map((f) => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
+                </div>
+                <ColorPickerField
+                  label="Color"
+                  color={customization.textClasses.callout.color}
+                  onChange={(c) => setTextClass('callout', { color: c })}
                 />
-                <span className={styles.sliderValue}>20</span>
               </div>
-            </div>
-            <ColorPickerField
-              label="Font Color"
-              color={customization.font.fontColor}
-              onChange={(c) => setFont({ fontColor: c })}
-            />
-          </Panel>
 
-          {/* ─── X-Axis ─── */}
-          <Panel emoji="📏" title="X-Axis">
-            <div className={styles.toggleRow}>
-              <span className={styles.toggleLabel}>Show Axis</span>
-              <div
-                className={`${styles.toggle} ${customization.xAxis.show ? styles.toggleActive : ''}`}
-                onClick={() => setXAxis({ show: !customization.xAxis.show })}
-              />
-            </div>
-            <div className={styles.toggleRow}>
-              <span className={styles.toggleLabel}>Show Title</span>
-              <div
-                className={`${styles.toggle} ${customization.xAxis.showAxisTitle ? styles.toggleActive : ''}`}
-                onClick={() => setXAxis({ showAxisTitle: !customization.xAxis.showAxisTitle })}
-              />
-            </div>
-            <div className={styles.fontRow}>
-              <div className={styles.fontLabel}>Gridline Style</div>
-              <select
-                className={styles.fontSelect}
-                value={customization.xAxis.gridlineStyle}
-                onChange={(e) =>
-                  setXAxis({ gridlineStyle: e.target.value as typeof customization.xAxis.gridlineStyle })
-                }
-              >
-                {GRIDLINE_STYLES.map((s) => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </div>
-            <ColorPickerField
-              label="Gridline Color"
-              color={customization.xAxis.gridlineColor}
-              onChange={(c) => setXAxis({ gridlineColor: c })}
-            />
-          </Panel>
-
-          {/* ─── Y-Axis ─── */}
-          <Panel emoji="📐" title="Y-Axis">
-            <div className={styles.toggleRow}>
-              <span className={styles.toggleLabel}>Show Axis</span>
-              <div
-                className={`${styles.toggle} ${customization.yAxis.show ? styles.toggleActive : ''}`}
-                onClick={() => setYAxis({ show: !customization.yAxis.show })}
-              />
-            </div>
-            <div className={styles.toggleRow}>
-              <span className={styles.toggleLabel}>Show Title</span>
-              <div
-                className={`${styles.toggle} ${customization.yAxis.showAxisTitle ? styles.toggleActive : ''}`}
-                onClick={() => setYAxis({ showAxisTitle: !customization.yAxis.showAxisTitle })}
-              />
-            </div>
-            <div className={styles.fontRow}>
-              <div className={styles.fontLabel}>Gridline Style</div>
-              <select
-                className={styles.fontSelect}
-                value={customization.yAxis.gridlineStyle}
-                onChange={(e) =>
-                  setYAxis({ gridlineStyle: e.target.value as typeof customization.yAxis.gridlineStyle })
-                }
-              >
-                {GRIDLINE_STYLES.map((s) => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </div>
-            <ColorPickerField
-              label="Gridline Color"
-              color={customization.yAxis.gridlineColor}
-              onChange={(c) => setYAxis({ gridlineColor: c })}
-            />
-          </Panel>
-
-          {/* ─── Legend ─── */}
-          <Panel emoji="📋" title="Legend">
-            <div className={styles.toggleRow}>
-              <span className={styles.toggleLabel}>Show Legend</span>
-              <div
-                className={`${styles.toggle} ${customization.legend.show ? styles.toggleActive : ''}`}
-                onClick={() => setLegend({ show: !customization.legend.show })}
-              />
-            </div>
-            <div className={styles.fontRow}>
-              <div className={styles.fontLabel}>Position</div>
-              <select
-                className={styles.fontSelect}
-                value={customization.legend.position}
-                onChange={(e) =>
-                  setLegend({ position: e.target.value as typeof customization.legend.position })
-                }
-              >
-                {LEGEND_POSITIONS.map((p) => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.fontRow}>
-              <div className={styles.fontLabel}>Font Size ({customization.legend.fontSize}pt)</div>
-              <div className={styles.sliderRow}>
-                <span className={styles.sliderValue}>7</span>
-                <input
-                  type="range"
-                  className={styles.slider}
-                  min={7}
-                  max={20}
-                  value={customization.legend.fontSize}
-                  onChange={(e) => setLegend({ fontSize: Number(e.target.value) })}
+              {/* Title */}
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>
+                  Title
+                </div>
+                <div className={styles.fontRow}>
+                  <div className={styles.fontLabel}>Font Size ({customization.textClasses.title.fontSize}pt)</div>
+                  <div className={styles.sliderRow}>
+                    <span className={styles.sliderValue}>8</span>
+                    <input
+                      type="range"
+                      className={styles.slider}
+                      min={8}
+                      max={24}
+                      value={customization.textClasses.title.fontSize}
+                      onChange={(e) =>
+                        setTextClass('title', { fontSize: Number(e.target.value) })
+                      }
+                    />
+                    <span className={styles.sliderValue}>24</span>
+                  </div>
+                </div>
+                <div className={styles.fontRow}>
+                  <div className={styles.fontLabel}>Font Family</div>
+                  <select
+                    className={styles.fontSelect}
+                    value={customization.textClasses.title.fontFace}
+                    onChange={(e) =>
+                      setTextClass('title', { fontFace: e.target.value })
+                    }
+                  >
+                    {FONT_FAMILIES.map((f) => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
+                </div>
+                <ColorPickerField
+                  label="Color"
+                  color={customization.textClasses.title.color}
+                  onChange={(c) => setTextClass('title', { color: c })}
                 />
-                <span className={styles.sliderValue}>20</span>
+              </div>
+
+              {/* Header */}
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>
+                  Header
+                </div>
+                <div className={styles.fontRow}>
+                  <div className={styles.fontLabel}>Font Size ({customization.textClasses.header.fontSize}pt)</div>
+                  <div className={styles.sliderRow}>
+                    <span className={styles.sliderValue}>8</span>
+                    <input
+                      type="range"
+                      className={styles.slider}
+                      min={8}
+                      max={24}
+                      value={customization.textClasses.header.fontSize}
+                      onChange={(e) =>
+                        setTextClass('header', { fontSize: Number(e.target.value) })
+                      }
+                    />
+                    <span className={styles.sliderValue}>24</span>
+                  </div>
+                </div>
+                <div className={styles.fontRow}>
+                  <div className={styles.fontLabel}>Font Family</div>
+                  <select
+                    className={styles.fontSelect}
+                    value={customization.textClasses.header.fontFace}
+                    onChange={(e) =>
+                      setTextClass('header', { fontFace: e.target.value })
+                    }
+                  >
+                    {FONT_FAMILIES.map((f) => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
+                </div>
+                <ColorPickerField
+                  label="Color"
+                  color={customization.textClasses.header.color}
+                  onChange={(c) => setTextClass('header', { color: c })}
+                />
+              </div>
+
+              {/* Label */}
+              <div style={{ marginBottom: 0 }}>
+                <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>
+                  Label
+                </div>
+                <div className={styles.fontRow}>
+                  <div className={styles.fontLabel}>Font Size ({customization.textClasses.label.fontSize}pt)</div>
+                  <div className={styles.sliderRow}>
+                    <span className={styles.sliderValue}>7</span>
+                    <input
+                      type="range"
+                      className={styles.slider}
+                      min={7}
+                      max={16}
+                      value={customization.textClasses.label.fontSize}
+                      onChange={(e) =>
+                        setTextClass('label', { fontSize: Number(e.target.value) })
+                      }
+                    />
+                    <span className={styles.sliderValue}>16</span>
+                  </div>
+                </div>
+                <div className={styles.fontRow}>
+                  <div className={styles.fontLabel}>Font Family</div>
+                  <select
+                    className={styles.fontSelect}
+                    value={customization.textClasses.label.fontFace}
+                    onChange={(e) =>
+                      setTextClass('label', { fontFace: e.target.value })
+                    }
+                  >
+                    {FONT_FAMILIES.map((f) => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
+                </div>
+                <ColorPickerField
+                  label="Color"
+                  color={customization.textClasses.label.color}
+                  onChange={(c) => setTextClass('label', { color: c })}
+                />
               </div>
             </div>
           </Panel>
@@ -502,46 +418,89 @@ export default function EditorPage() {
         </div>
       </aside>
 
-      {/* ─── Main Preview Panel ─── */}
+      {/* ─── Main Panel ─── */}
       <main className={styles.mainPanel}>
-        {/* Chart selector chips */}
-        <div className={styles.chartSelectorBar}>
-          {(Object.keys(CHART_TYPE_LABELS) as ChartType[]).map((chartType) => (
-            <button
-              key={chartType}
-              className={`${styles.chartChip} ${selectedCharts.includes(chartType) ? styles.chartChipActive : ''}`}
-              onClick={() => toggleChart(chartType)}
-              id={`chip-${chartType}`}
-            >
-              {CHART_TYPE_LABELS[chartType]}
-            </button>
-          ))}
-        </div>
+        {!selectedVisual ? (
+          <>
+            {/* Visual Selector Grid */}
+            <div className={styles.visualCustomizationScroll}>
+              <h2 style={{ fontSize: 28, fontWeight: 600, marginBottom: 10, color: 'var(--text-primary)' }}>
+                Visual Settings
+              </h2>
+              <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 40 }}>
+                Configure fonts and colors for different visual types
+              </p>
 
-        {/* Preview grid */}
-        <div className={styles.previewBody}>
-          <div className={styles.previewGrid}>
-            {selectedCharts.map((chartType) => {
-              const ChartComp = CHART_COMPONENTS[chartType];
-              return (
-                <div key={chartType} className={styles.chartCard}>
-                  <div className={styles.chartCardTitle}>
-                    {CHART_TYPE_LABELS[chartType]}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: 16,
+                }}
+              >
+                {allCharts.map((chartType) => (
+                  <div
+                    key={chartType}
+                    onClick={() => selectVisual(chartType)}
+                    style={{
+                      padding: 20,
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      backgroundColor: 'var(--bg-secondary)',
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--primary-color)';
+                      (e.currentTarget as HTMLDivElement).style.backgroundColor = 'var(--bg-hover)';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border-color)';
+                      (e.currentTarget as HTMLDivElement).style.backgroundColor = 'var(--bg-secondary)';
+                    }}
+                  >
+                    <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>
+                      {CHART_TYPE_LABELS[chartType]}
+                    </h3>
+                    <p style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 8, marginBottom: 0 }}>
+                      Click to customize
+                    </p>
                   </div>
-                  <div className={styles.chartContainer}>
-                    <ChartComp />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          {selectedCharts.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--text-tertiary)' }}>
-              <p style={{ fontSize: 48, marginBottom: 16 }}>📊</p>
-              <p style={{ fontSize: 16, fontWeight: 500 }}>Select chart types above to preview your theme</p>
+                ))}
+              </div>
             </div>
-          )}
-        </div>
+          </>
+        ) : (
+          <>
+            {/* Visual Customization Pane */}
+            <div className={styles.visualCustomizationScroll}>
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: 30 }}>
+                <button
+                  onClick={() => selectVisual(null)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: 20,
+                    cursor: 'pointer',
+                    color: 'var(--text-primary)',
+                    marginRight: 12,
+                  }}
+                >
+                  ←
+                </button>
+                <h2 style={{ fontSize: 28, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 0 }}>
+                  {CHART_TYPE_LABELS[selectedVisual]}
+                </h2>
+              </div>
+
+              <VisualCustomizationPanel
+                visual={selectedVisual}
+                customization={customization}
+                setVisualConfig={setVisualConfig}
+              />
+            </div>
+          </>
+        )}
       </main>
 
       {/* ─── Toast ─── */}
@@ -555,3 +514,313 @@ export default function EditorPage() {
     </div>
   );
 }
+
+/* ─── Visual Customization Panel ─── */
+function VisualCustomizationPanel({
+  visual,
+  customization,
+  setVisualConfig,
+}: {
+  visual: ChartType;
+  customization: any;
+  setVisualConfig: (visual: ChartType, config: any) => void;
+}) {
+  const visualConfig = customization.visualCustomizations[visual] || {};
+
+  /* ── Common Appearance Controls ── */
+  const renderAppearance = () => (
+    <div style={{ marginBottom: 24 }}>
+      <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 14, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 16 }}>🎨</span> Appearance
+      </h4>
+
+      <ColorPickerField
+        label="Primary Data Color"
+        color={visualConfig.primaryColor || customization.colors.dataColors[0]}
+        onChange={(c) => setVisualConfig(visual, { primaryColor: c })}
+      />
+      <ColorPickerField
+        label="Secondary Data Color"
+        color={visualConfig.secondaryColor || customization.colors.dataColors[1]}
+        onChange={(c) => setVisualConfig(visual, { secondaryColor: c })}
+      />
+      <ColorPickerField
+        label="Font Color"
+        color={visualConfig.fontColor || customization.colors.foreground}
+        onChange={(c) => setVisualConfig(visual, { fontColor: c })}
+      />
+
+      <div className={styles.fontRow}>
+        <div className={styles.fontLabel}>Font Size ({visualConfig.fontSize || customization.font.fontSize}pt)</div>
+        <div className={styles.sliderRow}>
+          <span className={styles.sliderValue}>6</span>
+          <input
+            type="range"
+            className={styles.slider}
+            min={6}
+            max={28}
+            value={visualConfig.fontSize || customization.font.fontSize}
+            onChange={(e) => setVisualConfig(visual, { fontSize: Number(e.target.value) })}
+          />
+          <span className={styles.sliderValue}>28</span>
+        </div>
+      </div>
+
+      <div className={styles.fontRow}>
+        <div className={styles.fontLabel}>Font Family</div>
+        <select
+          className={styles.fontSelect}
+          value={visualConfig.fontFamily || customization.font.fontFamily}
+          onChange={(e) => setVisualConfig(visual, { fontFamily: e.target.value })}
+        >
+          {FONT_FAMILIES.map((f) => (
+            <option key={f} value={f}>{f}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+
+  /* ── Visual-Specific Controls ── */
+  const renderSpecificControls = () => {
+    switch (visual) {
+      case 'scatterPlot':
+        return (
+          <>
+            <div className={styles.fontRow}>
+              <div className={styles.fontLabel}>Bubble Size</div>
+              <input
+                type="number"
+                className={styles.fontSelect}
+                value={visualConfig.bubbleSize || 0}
+                onChange={(e) => setVisualConfig(visual, { bubbleSize: Number(e.target.value) })}
+              />
+            </div>
+            <div className={styles.fontRow}>
+              <div className={styles.fontLabel}>Marker Range Type</div>
+              <select
+                className={styles.fontSelect}
+                value={visualConfig.markerRangeType || 'auto'}
+                onChange={(e) => setVisualConfig(visual, { markerRangeType: e.target.value as 'auto' | 'custom' })}
+              >
+                <option value="auto">Auto</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Fill Point</span>
+              <div
+                className={`${styles.toggle} ${visualConfig.fillPoint ? styles.toggleActive : ''}`}
+                onClick={() => setVisualConfig(visual, { fillPoint: !visualConfig.fillPoint })}
+              />
+            </div>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Show Legend</span>
+              <div
+                className={`${styles.toggle} ${visualConfig.showLegend ? styles.toggleActive : ''}`}
+                onClick={() => setVisualConfig(visual, { showLegend: !visualConfig.showLegend })}
+              />
+            </div>
+          </>
+        );
+
+      case 'pieChart':
+      case 'donutChart':
+        return (
+          <>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Show Legend</span>
+              <div
+                className={`${styles.toggle} ${visualConfig.showLegend ? styles.toggleActive : ''}`}
+                onClick={() => setVisualConfig(visual, { showLegend: !visualConfig.showLegend })}
+              />
+            </div>
+            <div className={styles.fontRow}>
+              <div className={styles.fontLabel}>Label Style</div>
+              <select
+                className={styles.fontSelect}
+                value={visualConfig.labelStyle || ''}
+                onChange={(e) => setVisualConfig(visual, { labelStyle: e.target.value })}
+              >
+                <option value="">Select Style</option>
+                <option value="Data value">Data value</option>
+                <option value="Data value, percent of total">Data value, percent of total</option>
+                <option value="Percent of total">Percent of total</option>
+              </select>
+            </div>
+          </>
+        );
+
+      case 'columnChart':
+      case 'clusteredColumnChart':
+      case 'barChart':
+      case 'clusteredBarChart':
+      case 'lineChart':
+      case 'areaChart':
+      case 'stackedAreaChart':
+        return (
+          <>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Show Legend</span>
+              <div
+                className={`${styles.toggle} ${visualConfig.showLegend ? styles.toggleActive : ''}`}
+                onClick={() => setVisualConfig(visual, { showLegend: !visualConfig.showLegend })}
+              />
+            </div>
+            {(visual === 'columnChart' || visual === 'clusteredColumnChart') && (
+              <div className={styles.toggleRow}>
+                <span className={styles.toggleLabel}>Show Gradient Legend</span>
+                <div
+                  className={`${styles.toggle} ${visualConfig.showGradientLegend ? styles.toggleActive : ''}`}
+                  onClick={() => setVisualConfig(visual, { showGradientLegend: !visualConfig.showGradientLegend })}
+                />
+              </div>
+            )}
+            {(visual === 'lineChart' || visual === 'areaChart' || visual === 'stackedAreaChart') && (
+              <div className={styles.toggleRow}>
+                <span className={styles.toggleLabel}>Match Series Interpolation</span>
+                <div
+                  className={`${styles.toggle} ${visualConfig.matchSeriesInterpolation ? styles.toggleActive : ''}`}
+                  onClick={() => setVisualConfig(visual, { matchSeriesInterpolation: !visualConfig.matchSeriesInterpolation })}
+                />
+              </div>
+            )}
+          </>
+        );
+
+      case 'kpiCard':
+        return (
+          <div className={styles.fontRow}>
+            <div className={styles.fontLabel}>Trendline Transparency</div>
+            <div className={styles.sliderRow}>
+              <span className={styles.sliderValue}>0</span>
+              <input
+                type="range"
+                className={styles.slider}
+                min={0}
+                max={100}
+                value={visualConfig.trendlineTransparency || 0}
+                onChange={(e) => setVisualConfig(visual, { trendlineTransparency: Number(e.target.value) })}
+              />
+              <span className={styles.sliderValue}>100</span>
+            </div>
+          </div>
+        );
+
+      case 'cardVisual':
+        return (
+          <>
+            <div className={styles.fontRow}>
+              <div className={styles.fontLabel}>Max Tiles</div>
+              <input
+                type="number"
+                className={styles.fontSelect}
+                min={1}
+                max={10}
+                value={visualConfig.maxTiles || 3}
+                onChange={(e) => setVisualConfig(visual, { maxTiles: Number(e.target.value) })}
+              />
+            </div>
+            <div className={styles.fontRow}>
+              <div className={styles.fontLabel}>Cell Padding</div>
+              <input
+                type="number"
+                className={styles.fontSelect}
+                min={0}
+                max={50}
+                value={visualConfig.cellPadding || 12}
+                onChange={(e) => setVisualConfig(visual, { cellPadding: Number(e.target.value) })}
+              />
+            </div>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Background Show</span>
+              <div
+                className={`${styles.toggle} ${visualConfig.backgroundShow ? styles.toggleActive : ''}`}
+                onClick={() => setVisualConfig(visual, { backgroundShow: !visualConfig.backgroundShow })}
+              />
+            </div>
+          </>
+        );
+
+      case 'matrixTable':
+        return (
+          <>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Show Expand/Collapse Buttons</span>
+              <div
+                className={`${styles.toggle} ${visualConfig.showExpandCollapseButtons ? styles.toggleActive : ''}`}
+                onClick={() => setVisualConfig(visual, { showExpandCollapseButtons: !visualConfig.showExpandCollapseButtons })}
+              />
+            </div>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Legacy Style Disabled</span>
+              <div
+                className={`${styles.toggle} ${visualConfig.legacyStyleDisabled ? styles.toggleActive : ''}`}
+                onClick={() => setVisualConfig(visual, { legacyStyleDisabled: !visualConfig.legacyStyleDisabled })}
+              />
+            </div>
+          </>
+        );
+
+      case 'slicerVisual':
+        return (
+          <>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Responsive</span>
+              <div
+                className={`${styles.toggle} ${visualConfig.responsive ? styles.toggleActive : ''}`}
+                onClick={() => setVisualConfig(visual, { responsive: !visualConfig.responsive })}
+              />
+            </div>
+            <div className={styles.toggleRow}>
+              <span className={styles.toggleLabel}>Hide Date Picker Button</span>
+              <div
+                className={`${styles.toggle} ${visualConfig.hideDatePickerButton ? styles.toggleActive : ''}`}
+                onClick={() => setVisualConfig(visual, { hideDatePickerButton: !visualConfig.hideDatePickerButton })}
+              />
+            </div>
+            <div className={styles.fontRow}>
+              <div className={styles.fontLabel}>Item Padding</div>
+              <input
+                type="number"
+                className={styles.fontSelect}
+                min={0}
+                max={20}
+                value={visualConfig.itemPadding || 4}
+                onChange={(e) => setVisualConfig(visual, { itemPadding: Number(e.target.value) })}
+              />
+            </div>
+          </>
+        );
+
+      default:
+        return (
+          <div className={styles.toggleRow}>
+            <span className={styles.toggleLabel}>Show Legend</span>
+            <div
+              className={`${styles.toggle} ${visualConfig.showLegend ? styles.toggleActive : ''}`}
+              onClick={() => setVisualConfig(visual, { showLegend: !visualConfig.showLegend })}
+            />
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div style={{ backgroundColor: 'var(--bg-secondary)', padding: 24, borderRadius: 8 }}>
+      {/* Common appearance controls */}
+      {renderAppearance()}
+
+      {/* Visual-specific controls */}
+      <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: 20 }}>
+        <h4 style={{ fontSize: 13, fontWeight: 600, marginBottom: 14, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 16 }}>⚙️</span> Visual-Specific Options
+        </h4>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {renderSpecificControls()}
+        </div>
+      </div>
+    </div>
+  );
+}
+

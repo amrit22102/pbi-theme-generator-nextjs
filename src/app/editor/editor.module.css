@@ -553,3 +553,310 @@
   padding: 40px 20px;
   width: 100%;
 }
+
+/* ─── Export Buttons Group ─── */
+.exportBtnGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.exportBtnSecondary {
+  flex: 1;
+  padding: 16px;
+  border-radius: var(--radius-full);
+  background: var(--md-surface-container);
+  color: var(--md-primary);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--transition-base);
+  border: 1px solid var(--md-primary);
+  cursor: pointer;
+}
+
+.exportBtnSecondary:hover {
+  background: var(--md-primary-container);
+  box-shadow: var(--shadow-sm);
+}
+
+.exportBtnSecondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── JSON Preview Panel (Right Sidebar) ─── */
+.jsonPreviewPanel {
+  width: 420px;
+  min-width: 420px;
+  height: 100vh;
+  background: var(--md-surface-dim);
+  border-left: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.jsonPreviewHeader {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--md-surface-dim);
+  flex-shrink: 0;
+}
+
+.jsonPreviewHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.jsonPreviewTitle {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.jsonPreviewBadge {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--md-on-primary-container);
+  background: var(--md-primary-container);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.jsonPreviewActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.jsonActionBtn {
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--transition-fast);
+}
+
+.jsonActionBtn:hover {
+  color: var(--text-primary);
+  background: var(--md-surface-container);
+}
+
+.jsonActionBtnActive {
+  color: var(--md-on-primary);
+  background: var(--md-primary);
+}
+
+.jsonActionBtnActive:hover {
+  opacity: 0.9;
+}
+
+.jsonCloseBtn {
+  padding: 6px 10px;
+  border-radius: var(--radius-full);
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  background: transparent;
+  transition: all var(--transition-fast);
+  line-height: 1;
+}
+
+.jsonCloseBtn:hover {
+  color: var(--text-primary);
+  background: var(--md-surface-container-high);
+}
+
+/* ─── JSON Search Bar ─── */
+.jsonSearchBar {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+}
+
+.jsonSearchInput {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--md-surface-container-low);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: 'Google Sans Mono', 'Roboto Mono', monospace;
+  transition: border-color var(--transition-fast);
+}
+
+.jsonSearchInput:focus {
+  border-color: var(--md-primary);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.jsonSearchInput::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* ─── JSON Code Body ─── */
+.jsonPreviewBody {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding: 0;
+  background: var(--md-surface-container-low);
+  position: relative;
+}
+
+.jsonCodeWrapper {
+  display: flex;
+  min-height: 100%;
+}
+
+.jsonLineNumbers {
+  padding: 16px 0;
+  text-align: right;
+  user-select: none;
+  flex-shrink: 0;
+  background: var(--md-surface-container);
+  border-right: 1px solid var(--border-default);
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.jsonLineNumber {
+  display: block;
+  padding: 0 12px 0 16px;
+  font-family: 'Google Sans Mono', 'Roboto Mono', monospace;
+  font-size: 11px;
+  line-height: 20px;
+  color: var(--text-tertiary);
+}
+
+.jsonLineNumberHighlight {
+  color: var(--md-primary);
+  background: var(--md-primary-container);
+}
+
+.jsonCodeContent {
+  flex: 1;
+  padding: 16px;
+  font-family: 'Google Sans Mono', 'Roboto Mono', monospace;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: pre;
+  color: var(--text-secondary);
+  tab-size: 2;
+}
+
+/* ─── JSON Syntax Highlighting ─── */
+.jsonKey {
+  color: #9cdcfe;
+}
+
+.jsonString {
+  color: #ce9178;
+}
+
+.jsonNumber {
+  color: #b5cea8;
+}
+
+.jsonBool {
+  color: #569cd6;
+}
+
+.jsonNull {
+  color: #569cd6;
+  font-style: italic;
+}
+
+.jsonBrace {
+  color: var(--text-tertiary);
+}
+
+.jsonSearchMatch {
+  background: rgba(255, 213, 0, 0.3);
+  border-radius: 2px;
+  outline: 1px solid rgba(255, 213, 0, 0.6);
+}
+
+/* ─── JSON Preview Toggle Button (in main panel) ─── */
+.jsonToggleBtn {
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--md-outline);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.jsonToggleBtn:hover {
+  background: var(--md-surface-container-low);
+  color: var(--text-primary);
+}
+
+.jsonToggleBtnActive {
+  background: var(--md-primary-container);
+  border-color: transparent;
+  color: var(--md-on-primary-container);
+}
+
+/* ─── JSON Preview Footer ─── */
+.jsonPreviewFooter {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-default);
+  background: var(--md-surface-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.jsonStats {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: 'Google Sans Mono', 'Roboto Mono', monospace;
+}
+
+/* ─── Main panel header bar ─── */
+.mainPanelHeader {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: var(--md-surface-dim);
+  flex-shrink: 0;
+  gap: 8px;
+}

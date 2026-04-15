@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { HexColorPicker } from 'react-colorful';
 import { useThemeStore } from '@/store/themeStore';
-import { exportThemeJSON } from '@/lib/themeExporter';
+import { exportThemeJSON, exportPBIXPackage } from '@/lib/themeExporter';
 import {
   ChartType,
   CHART_TYPE_LABELS,
@@ -105,6 +105,192 @@ function Panel({
   );
 }
 
+/* ─── JSON Syntax Highlighter ─── */
+function highlightJSON(jsonStr: string, searchTerm: string): { html: string; matchLines: Set<number> } {
+  const matchLines = new Set<number>();
+  const lines = jsonStr.split('\n');
+  const lowerSearch = searchTerm.toLowerCase();
+
+  const highlightedLines = lines.map((line, lineIdx) => {
+    let highlighted = line
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // Highlight JSON syntax
+    // Keys
+    highlighted = highlighted.replace(
+      /(&quot;|")((?:[^"\\]|\\.)*)(&quot;|")\s*:/g,
+      '<span class="jsonKey">"$2"</span>:'
+    );
+    // String values
+    highlighted = highlighted.replace(
+      /:\s*(&quot;|")((?:[^"\\]|\\.)*)(&quot;|")/g,
+      ': <span class="jsonString">"$2"</span>'
+    );
+    // Standalone strings in arrays
+    highlighted = highlighted.replace(
+      /^\s*(&quot;|")((?:[^"\\]|\\.)*)(&quot;|")/gm,
+      (match) => {
+        if (match.includes('jsonKey') || match.includes('jsonString')) return match;
+        return match.replace(/(&quot;|")((?:[^"\\]|\\.)*)(&quot;|")/,
+          '<span class="jsonString">"$2"</span>'
+        );
+      }
+    );
+    // Numbers
+    highlighted = highlighted.replace(
+      /:\s*(-?\d+\.?\d*)/g,
+      ': <span class="jsonNumber">$1</span>'
+    );
+    // Booleans
+    highlighted = highlighted.replace(
+      /:\s*(true|false)/g,
+      ': <span class="jsonBool">$1</span>'
+    );
+    // Null
+    highlighted = highlighted.replace(
+      /:\s*(null)/g,
+      ': <span class="jsonNull">$1</span>'
+    );
+
+    // Search highlighting
+    if (searchTerm && line.toLowerCase().includes(lowerSearch)) {
+      matchLines.add(lineIdx);
+      const escapedSearch = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp(`(${escapedSearch})`, 'gi');
+      highlighted = highlighted.replace(
+        searchRegex,
+        '<span class="jsonSearchMatch">$1</span>'
+      );
+    }
+
+    return highlighted;
+  });
+
+  return { html: highlightedLines.join('\n'), matchLines };
+}
+
+/* ─── JSON Preview Panel Component ─── */
+function JSONPreviewPanel({
+  jsonStr,
+  onClose,
+}: {
+  jsonStr: string;
+  onClose: () => void;
+}) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const { html, matchLines } = useMemo(
+    () => highlightJSON(jsonStr, searchTerm),
+    [jsonStr, searchTerm]
+  );
+
+  const lines = jsonStr.split('\n');
+  const lineCount = lines.length;
+  const charCount = jsonStr.length;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(jsonStr);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback
+      const textArea = document.createElement('textarea');
+      textArea.value = jsonStr;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className={styles.jsonPreviewPanel} id="json-preview-panel">
+      {/* Header */}
+      <div className={styles.jsonPreviewHeader}>
+        <div className={styles.jsonPreviewHeaderLeft}>
+          <span className={styles.jsonPreviewTitle}>📄 JSON Output</span>
+          <span className={styles.jsonPreviewBadge}>LIVE</span>
+        </div>
+        <div className={styles.jsonPreviewActions}>
+          <button
+            className={`${styles.jsonActionBtn} ${showSearch ? styles.jsonActionBtnActive : ''}`}
+            onClick={() => setShowSearch(!showSearch)}
+            title="Search"
+          >
+            🔍
+          </button>
+          <button
+            className={`${styles.jsonActionBtn} ${copied ? styles.jsonActionBtnActive : ''}`}
+            onClick={handleCopy}
+            title="Copy to clipboard"
+          >
+            {copied ? '✓ Copied' : '📋 Copy'}
+          </button>
+          <button
+            className={styles.jsonCloseBtn}
+            onClick={onClose}
+            title="Close panel"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      {/* Search */}
+      {showSearch && (
+        <div className={styles.jsonSearchBar}>
+          <input
+            className={styles.jsonSearchInput}
+            placeholder="Search in JSON..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            autoFocus
+          />
+        </div>
+      )}
+
+      {/* JSON Body */}
+      <div className={styles.jsonPreviewBody}>
+        <div className={styles.jsonCodeWrapper}>
+          <div className={styles.jsonLineNumbers}>
+            {Array.from({ length: lineCount }, (_, i) => (
+              <span
+                key={i}
+                className={`${styles.jsonLineNumber} ${matchLines.has(i) ? styles.jsonLineNumberHighlight : ''}`}
+              >
+                {i + 1}
+              </span>
+            ))}
+          </div>
+          <code
+            className={styles.jsonCodeContent}
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className={styles.jsonPreviewFooter}>
+        <span className={styles.jsonStats}>
+          {lineCount} lines · {(charCount / 1024).toFixed(1)} KB
+        </span>
+        {searchTerm && (
+          <span className={styles.jsonStats}>
+            {matchLines.size} match{matchLines.size !== 1 ? 'es' : ''}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main Editor Page ─── */
 export default function EditorPage() {
   const router = useRouter();
@@ -122,7 +308,8 @@ export default function EditorPage() {
     getExportJSON,
   } = useThemeStore();
 
-  const [showExportPreview, setShowExportPreview] = useState(false);
+  const [showJsonPreview, setShowJsonPreview] = useState(false);
+  const [pbixExporting, setPbixExporting] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
 
   const showToast = useCallback((type: 'success' | 'error', msg: string) => {
@@ -139,6 +326,32 @@ export default function EditorPage() {
       showToast('error', result.error || 'Export failed');
     }
   };
+
+  const handlePBIXExport = async () => {
+    setPbixExporting(true);
+    try {
+      const json = getExportJSON();
+      const result = await exportPBIXPackage(json, customization.name);
+      if (result.success) {
+        showToast('success', `PBIX "${customization.name}" exported with theme applied!`);
+      } else {
+        showToast('error', result.error || 'PBIX export failed');
+      }
+    } catch {
+      showToast('error', 'Unexpected error during PBIX export');
+    } finally {
+      setPbixExporting(false);
+    }
+  };
+
+  const exportJSON = useMemo(() => {
+    return getExportJSON();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customization]);
+
+  const jsonStr = useMemo(() => {
+    return JSON.stringify(exportJSON, null, 2);
+  }, [exportJSON]);
 
   const allCharts: ChartType[] = [
     'columnChart',
@@ -398,28 +611,35 @@ export default function EditorPage() {
 
         {/* ─── Export ─── */}
         <div className={styles.exportSection}>
-          <button className={styles.exportBtn} onClick={handleExport} id="export-btn">
-            📥 Export Theme JSON
-          </button>
-          <div className={styles.exportPreview}>
-            <span
-              className={styles.exportPreviewToggle}
-              onClick={() => setShowExportPreview(!showExportPreview)}
+          <div className={styles.exportBtnGroup}>
+            <button className={styles.exportBtn} onClick={handleExport} id="export-json-btn" style={{ flex: 1 }}>
+              📥 JSON
+            </button>
+            <button
+              className={styles.exportBtnSecondary}
+              onClick={handlePBIXExport}
+              disabled={pbixExporting}
+              id="export-pbix-btn"
             >
-              {showExportPreview ? '▾ Hide' : '▸ Preview'} JSON
-            </span>
-            {showExportPreview && (
-              <pre className={styles.exportPreviewCode}>
-                {JSON.stringify(getExportJSON(), null, 2).slice(0, 2000)}
-                {JSON.stringify(getExportJSON(), null, 2).length > 2000 ? '\n...' : ''}
-              </pre>
-            )}
+              {pbixExporting ? '⏳ Exporting...' : '📦 PBIX'}
+            </button>
           </div>
         </div>
       </aside>
 
       {/* ─── Main Panel ─── */}
       <main className={styles.mainPanel}>
+        {/* Header bar with JSON toggle */}
+        <div className={styles.mainPanelHeader}>
+          <button
+            className={`${styles.jsonToggleBtn} ${showJsonPreview ? styles.jsonToggleBtnActive : ''}`}
+            onClick={() => setShowJsonPreview(!showJsonPreview)}
+            id="json-preview-toggle"
+          >
+            {showJsonPreview ? '◀ Hide' : '▶ Show'} JSON
+          </button>
+        </div>
+
         {!selectedVisual ? (
           <>
             {/* Visual Selector Grid */}
@@ -502,6 +722,14 @@ export default function EditorPage() {
           </>
         )}
       </main>
+
+      {/* ─── JSON Preview Panel (Right Sidebar) ─── */}
+      {showJsonPreview && (
+        <JSONPreviewPanel
+          jsonStr={jsonStr}
+          onClose={() => setShowJsonPreview(false)}
+        />
+      )}
 
       {/* ─── Toast ─── */}
       {toast && (
@@ -823,4 +1051,3 @@ function VisualCustomizationPanel({
     </div>
   );
 }
-

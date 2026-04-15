@@ -242,16 +242,50 @@ function buildVisualStyles(customization: ThemeCustomization, selectedCharts: Ch
     if (keys) keys.forEach((k) => selectedVisualKeys.add(k));
   }
 
+  /* Helper to read a visual-specific option, falling back to a default */
+  const vc = (chart: ChartType, key: string, fallback: unknown) => {
+    const cfg = customization.visualCustomizations[chart];
+    if (cfg && key in cfg) return (cfg as Record<string, unknown>)[key];
+    return fallback;
+  };
+
+  /* ── Build visual styles using live customization values ── */
   const allVisualStyles: Record<string, unknown> = {
-    scatterChart: { '*': { bubbles: [{ bubbleSize: -10, markerRangeType: 'auto' }], general: [{ responsive: true }], fillPoint: [{ show: true }], legend: [{ showGradientLegend: true }] } },
-    lineChart: { '*': { general: [{ responsive: true }], smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }], forecast: [{ matchSeriesInterpolation: true }] } },
-    pieChart: { '*': { legend: [{ show: customization.legend.show, position: customization.legend.position }], labels: [{ labelStyle: 'Data value, percent of total' }] } },
-    donutChart: { '*': { legend: [{ show: customization.legend.show, position: customization.legend.position }], labels: [{ labelStyle: 'Data value, percent of total' }] } },
-    pivotTable: { '*': { rowHeaders: [{ showExpandCollapseButtons: true, legacyStyleDisabled: true }] } },
+    scatterChart: { '*': {
+      bubbles: [{ bubbleSize: vc('scatterPlot', 'bubbleSize', -10), markerRangeType: vc('scatterPlot', 'markerRangeType', 'auto') }],
+      general: [{ responsive: true }],
+      fillPoint: [{ show: vc('scatterPlot', 'fillPoint', true) }],
+      legend: [{ show: vc('scatterPlot', 'showLegend', true), showGradientLegend: true }],
+    } },
+    lineChart: { '*': {
+      general: [{ responsive: true }],
+      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+      forecast: [{ matchSeriesInterpolation: vc('lineChart', 'matchSeriesInterpolation', true) }],
+      legend: [{ show: vc('lineChart', 'showLegend', true) }],
+    } },
+    pieChart: { '*': {
+      legend: [{ show: vc('pieChart', 'showLegend', customization.legend.show), position: customization.legend.position }],
+      labels: [{ labelStyle: vc('pieChart', 'labelStyle', 'Data value, percent of total') }],
+    } },
+    donutChart: { '*': {
+      legend: [{ show: vc('donutChart', 'showLegend', customization.legend.show), position: customization.legend.position }],
+      labels: [{ labelStyle: vc('donutChart', 'labelStyle', 'Data value, percent of total') }],
+    } },
+    pivotTable: { '*': {
+      rowHeaders: [{
+        showExpandCollapseButtons: vc('matrixTable', 'showExpandCollapseButtons', true),
+        legacyStyleDisabled: vc('matrixTable', 'legacyStyleDisabled', true),
+      }],
+    } },
     multiRowCard: { '*': { card: [{ outlineWeight: 2, barShow: true, barWeight: 2 }] } },
-    kpi: { '*': { trendline: [{ transparency: 20 }] } },
+    kpi: { '*': {
+      trendline: [{ transparency: vc('kpiCard', 'trendlineTransparency', 20) }],
+    } },
     cardVisual: { '*': {
-      layout: [{ maxTiles: 3 }, { $id: 'default', cellPadding: 12, paddingIndividual: false, paddingUniform: 12, backgroundShow: true }],
+      layout: [
+        { maxTiles: vc('cardVisual', 'maxTiles', 3) },
+        { $id: 'default', cellPadding: vc('cardVisual', 'cellPadding', 12), paddingIndividual: false, paddingUniform: vc('cardVisual', 'cellPadding', 12), backgroundShow: vc('cardVisual', 'backgroundShow', true) },
+      ],
       overflow: [{ type: 0 }],
       image: [{ $id: 'default', position: 'Left', imageAreaSize: 20, padding: 12, rectangleRoundedCurve: 4, fit: 'Normal', fixedSize: false }],
       referenceLabel: [{ $id: 'default', backgroundColor: { solid: { color: 'backgroundLight' } }, paddingUniform: 12, rectangleRoundedCurveCustomStyle: true, rectangleRoundedCurveLeftBottom: 4, rectangleRoundedCurveRightBottom: 4 }],
@@ -261,18 +295,51 @@ function buildVisualStyles(customization: ThemeCustomization, selectedCharts: Ch
       padding: [{ $id: 'default', paddingUniform: 12, paddingIndividual: false }],
     } },
     advancedSlicerVisual: { '*': { layout: [{ maxTiles: 3 }], shapeCustomRectangle: [{ $id: 'default', tileShape: 'rectangleRoundedByPixel', rectangleRoundedCurve: 4 }], selectionIcon: [{ $id: 'default', size: 12 }] } },
-    slicer: { '*': { general: [{ responsive: true }], date: [{ hideDatePickerButton: false }], items: [{ padding: 4, accessibilityContrastProperties: true }] } },
-    waterfallChart: { '*': { general: [{ responsive: true }] } },
-    columnChart: { '*': { general: [{ responsive: true }], legend: [{ showGradientLegend: true }], smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }] } },
-    clusteredColumnChart: { '*': { general: [{ responsive: true }], legend: [{ showGradientLegend: true }], smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }] } },
-    barChart: { '*': { general: [{ responsive: true }], legend: [{ showGradientLegend: true }], smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }] } },
-    clusteredBarChart: { '*': { general: [{ responsive: true }], legend: [{ showGradientLegend: true }], smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }] } },
-    areaChart: { '*': { general: [{ responsive: true }], smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }] } },
-    stackedAreaChart: { '*': { general: [{ responsive: true }], smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }] } },
-    ribbonChart: { '*': { general: [{ responsive: true }], smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }], valueAxis: [{ show: true }] } },
-    treemapChart: { '*': { general: [{ responsive: true }] } },
-    funnelChart: { '*': { general: [{ responsive: true }] } },
-    gaugeChart: { '*': { general: [{ responsive: true }] } },
+    slicer: { '*': {
+      general: [{ responsive: vc('slicerVisual', 'responsive', true) }],
+      date: [{ hideDatePickerButton: vc('slicerVisual', 'hideDatePickerButton', false) }],
+      items: [{ padding: vc('slicerVisual', 'itemPadding', 4), accessibilityContrastProperties: true }],
+    } },
+    waterfallChart: { '*': { general: [{ responsive: true }], legend: [{ show: vc('waterfallChart', 'showLegend', true) }] } },
+    columnChart: { '*': {
+      general: [{ responsive: true }],
+      legend: [{ show: vc('columnChart', 'showLegend', true), showGradientLegend: vc('columnChart', 'showGradientLegend', true) }],
+      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+    } },
+    clusteredColumnChart: { '*': {
+      general: [{ responsive: true }],
+      legend: [{ show: vc('clusteredColumnChart', 'showLegend', true), showGradientLegend: vc('clusteredColumnChart', 'showGradientLegend', true) }],
+      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+    } },
+    barChart: { '*': {
+      general: [{ responsive: true }],
+      legend: [{ show: vc('barChart', 'showLegend', true), showGradientLegend: true }],
+      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+    } },
+    clusteredBarChart: { '*': {
+      general: [{ responsive: true }],
+      legend: [{ show: vc('clusteredBarChart', 'showLegend', true), showGradientLegend: true }],
+      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+    } },
+    areaChart: { '*': {
+      general: [{ responsive: true }],
+      legend: [{ show: vc('areaChart', 'showLegend', true) }],
+      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+    } },
+    stackedAreaChart: { '*': {
+      general: [{ responsive: true }],
+      legend: [{ show: vc('stackedAreaChart', 'showLegend', true) }],
+      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+    } },
+    ribbonChart: { '*': {
+      general: [{ responsive: true }],
+      legend: [{ show: vc('ribbonChart', 'showLegend', true) }],
+      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+      valueAxis: [{ show: true }],
+    } },
+    treemapChart: { '*': { general: [{ responsive: true }], legend: [{ show: vc('treemapChart', 'showLegend', true) }] } },
+    funnelChart: { '*': { general: [{ responsive: true }], legend: [{ show: vc('funnelChart', 'showLegend', true) }] } },
+    gaugeChart: { '*': { general: [{ responsive: true }], legend: [{ show: vc('gaugeChart', 'showLegend', true) }] } },
   };
 
   const alwaysInclude: Record<string, unknown> = {

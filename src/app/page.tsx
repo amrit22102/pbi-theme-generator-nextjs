@@ -92,6 +92,34 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+
+        {/* ─── Live Preview CTA (Full Width) ─── */}
+        <div
+          className={`${styles.ctaLivePreview} glass-card glass-card-hover`}
+          onClick={() => router.push('/live-preview')}
+          id="cta-live-preview"
+        >
+          <div className={styles.ctaLivePreviewContent}>
+            <div className={styles.ctaLivePreviewLeft}>
+              <div className={`${styles.ctaIcon} ${styles.ctaLivePreviewIcon}`}>📊</div>
+              <div>
+                <h2 className={styles.ctaTitle}>Live Preview on Real Report</h2>
+                <p className={styles.ctaDesc} style={{ marginBottom: 0 }}>
+                  Embed a real Power BI report and see your theme changes applied in
+                  real-time. Connect to your workspace and preview exactly how your
+                  theme will look in production.
+                </p>
+              </div>
+            </div>
+            <div className={styles.ctaArrow}>
+              Launch Preview <span>→</span>
+            </div>
+          </div>
+          <div className={styles.ctaLivePreviewBadge}>
+            <span className={styles.ctaLivePreviewDot} />
+            POWER BI EMBEDDED
+          </div>
+        </div>
       </section>
 
       {/* ─── Features ─── */}

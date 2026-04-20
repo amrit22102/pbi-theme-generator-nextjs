@@ -1,101 +1,117 @@
-/* ─── Power BI Theme Studio — Material You (M3) Design System ─── */
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Text:wght@400;500;600;700&family=Product+Sans:wght@400;700&display=swap');
+/* ─── Power BI Theme Studio — Corporate Design System ─── */
 
 :root {
-  /* ─ M3 Primary Tonal Palette ─ */
-  --md-primary: #1a73e8;
-  --md-on-primary: #ffffff;
-  --md-primary-container: #d3e3fd;
-  --md-on-primary-container: #062e6f;
+  /* ─ Brand Colors ─ */
+  --brand-header: #1a3a5c;
+  --brand-header-light: #2a5a8c;
 
-  /* ─ M3 Secondary ─ */
-  --md-secondary: #5f6368;
-  --md-on-secondary: #ffffff;
-  --md-secondary-container: #e8eaed;
-  --md-on-secondary-container: #3c4043;
+  /* ─ Color Palette: Green ─ */
+  --color-green-dark: rgb(76, 175, 80);
+  --color-green-light: rgb(232, 245, 233);
+  /* ─ Color Palette: Blue ─ */
+  --color-blue-dark: rgb(21, 101, 192);
+  --color-blue-light: rgb(227, 242, 253);
+  /* ─ Color Palette: Orange ─ */
+  --color-orange-dark: rgb(249, 168, 37);
+  --color-orange-light: rgb(255, 248, 225);
+  /* ─ Color Palette: Purple ─ */
+  --color-purple-dark: rgb(156, 39, 176);
+  --color-purple-light: rgb(237, 231, 246);
 
-  /* ─ M3 Tertiary ─ */
-  --md-tertiary: #1e8e3e;
-  --md-tertiary-container: #ceead6;
-
-  /* ─ M3 Surface / Background ─ */
+  /* ─ Surface / Background ─ */
   --md-surface: #ffffff;
-  --md-surface-dim: #f8f9fa;
+  --md-surface-dim: #f7f6f3;
   --md-surface-bright: #ffffff;
   --md-surface-container-lowest: #ffffff;
-  --md-surface-container-low: #f1f3f4;
-  --md-surface-container: #e8eaed;
-  --md-surface-container-high: #dadce0;
-  --md-surface-container-highest: #c4c7c5;
-  --md-surface-variant: #e8eaed;
-  --md-on-surface: #202124;
-  --md-on-surface-variant: #5f6368;
-  --md-outline: #dadce0;
-  --md-outline-variant: #e8eaed;
+  --md-surface-container-low: #f9f8f5;
+  --md-surface-container: #f0efec;
+  --md-surface-container-high: #e5e4e0;
+  --md-surface-container-highest: #d0ccc4;
+  --md-surface-variant: #f0efec;
+  --md-on-surface: #1a3a5c;
+  --md-on-surface-variant: #4a5568;
+  --md-outline: #d0ccc4;
+  --md-outline-variant: #e5e4e0;
 
-  /* ─ M3 Error ─ */
+  /* ─ Primary (mapped from brand) ─ */
+  --md-primary: #1a3a5c;
+  --md-on-primary: #ffffff;
+  --md-primary-container: rgb(227, 242, 253);
+  --md-on-primary-container: #1a3a5c;
+
+  /* ─ Secondary ─ */
+  --md-secondary: #4a5568;
+  --md-on-secondary: #ffffff;
+  --md-secondary-container: #f0efec;
+  --md-on-secondary-container: #2d3748;
+
+  /* ─ Tertiary ─ */
+  --md-tertiary: rgb(76, 175, 80);
+  --md-tertiary-container: rgb(232, 245, 233);
+
+  /* ─ Error ─ */
   --md-error: #d93025;
   --md-error-container: #fce8e6;
 
-  /* ─ Design Tokens mapped ─ */
-  --bg-primary: var(--md-surface);
-  --bg-secondary: var(--md-surface-dim);
-  --bg-tertiary: var(--md-surface-container-low);
-  --bg-card: var(--md-surface);
-  --bg-card-solid: var(--md-surface);
-  --bg-card-hover: var(--md-surface-dim);
-  --bg-surface: var(--md-surface-container-low);
-  --bg-input: var(--md-surface);
+  /* ─ Design Tokens ─ */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f6f3;
+  --bg-tertiary: #f9f8f5;
+  --bg-card: #ffffff;
+  --bg-card-solid: #ffffff;
+  --bg-card-hover: #f9f8f5;
+  --bg-surface: #f9f8f5;
+  --bg-input: #ffffff;
 
-  --accent-primary: var(--md-primary);
-  --accent-primary-hover: #1765cc;
-  --accent-secondary: var(--md-tertiary);
-  --accent-secondary-hover: #1a7d36;
-  --accent-gradient: linear-gradient(135deg, #1a73e8 0%, #8ab4f8 100%);
-  --accent-glow: rgba(26, 115, 232, 0.08);
-  --accent-glow-strong: rgba(26, 115, 232, 0.16);
+  --accent-primary: #1a3a5c;
+  --accent-primary-hover: #2a5a8c;
+  --accent-secondary: rgb(76, 175, 80);
+  --accent-secondary-hover: rgb(56, 142, 60);
+  --accent-gradient: linear-gradient(135deg, #1a3a5c 0%, #2a5a8c 100%);
+  --accent-glow: rgba(26, 58, 92, 0.08);
+  --accent-glow-strong: rgba(26, 58, 92, 0.16);
 
-  --text-primary: var(--md-on-surface);
-  --text-secondary: var(--md-on-surface-variant);
-  --text-tertiary: #9aa0a6;
-  --text-accent: var(--md-primary);
-  --text-on-accent: var(--md-on-primary);
+  --text-primary: #1a3a5c;
+  --text-secondary: #4a5568;
+  --text-tertiary: #718096;
+  --text-accent: #1a3a5c;
+  --text-on-accent: #ffffff;
 
   --border-subtle: transparent;
-  --border-default: var(--md-outline-variant);
-  --border-hover: var(--md-outline);
-  --border-accent: rgba(26, 115, 232, 0.3);
+  --border-default: #d0ccc4;
+  --border-hover: #b0ada6;
+  --border-accent: rgba(21, 101, 192, 0.3);
 
-  /* ─ M3 Shape Scale ─ */
-  --radius-xs: 8px;
-  --radius-sm: 12px;
-  --radius-md: 16px;
-  --radius-lg: 28px;
-  --radius-xl: 28px;
+  /* ─ Shape ─ */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
   --radius-full: 9999px;
 
-  /* ─ M3 Elevation (light mode) ─ */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.06);
-  --shadow-glow: 0 1px 8px rgba(26, 115, 232, 0.08);
-  --shadow-glow-strong: 0 2px 16px rgba(26, 115, 232, 0.16);
+  /* ─ Elevation ─ */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.10);
+  --shadow-glow: 0 1px 8px rgba(26, 58, 92, 0.06);
+  --shadow-glow-strong: 0 2px 16px rgba(26, 58, 92, 0.12);
 
   /* ─ Transitions ─ */
-  --transition-fast: 150ms cubic-bezier(0.2, 0, 0, 1);
-  --transition-base: 250ms cubic-bezier(0.2, 0, 0, 1);
-  --transition-slow: 400ms cubic-bezier(0.2, 0, 0, 1);
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
 
   /* ─ Typography ─ */
-  --font-sans: 'Google Sans Text', 'Google Sans', 'Product Sans', 'Inter', -apple-system, Roboto, sans-serif;
-  --font-display: 'Google Sans', 'Product Sans', 'Inter', sans-serif;
+  --font-sans: 'Segoe UI', -apple-system, system-ui, sans-serif;
+  --font-display: 'Segoe UI', -apple-system, system-ui, sans-serif;
 }
 
-/* ─── Dark Theme (M3 Dark Scheme) ─── */
+/* ─── Dark Theme ─── */
 .dark {
   --md-primary: #8ab4f8;
-  --md-on-primary: #062e6f;
-  --md-primary-container: #174ea6;
+  --md-on-primary: #1a3a5c;
+  --md-primary-container: #1e3a5f;
   --md-on-primary-container: #d3e3fd;
 
   --md-secondary: #9aa0a6;
@@ -104,21 +120,21 @@
   --md-on-secondary-container: #e8eaed;
 
   --md-tertiary: #81c995;
-  --md-tertiary-container: #137333;
+  --md-tertiary-container: #1b5e20;
 
-  --md-surface: #1f1f1f;
-  --md-surface-dim: #141414;
-  --md-surface-bright: #2d2d2d;
-  --md-surface-container-lowest: #0e0e0e;
-  --md-surface-container-low: #1a1a1a;
-  --md-surface-container: #252525;
-  --md-surface-container-high: #303030;
-  --md-surface-container-highest: #3c3c3c;
-  --md-surface-variant: #303030;
+  --md-surface: #1a1a2e;
+  --md-surface-dim: #12121f;
+  --md-surface-bright: #2a2a3e;
+  --md-surface-container-lowest: #0e0e1a;
+  --md-surface-container-low: #1e1e32;
+  --md-surface-container: #252538;
+  --md-surface-container-high: #30304a;
+  --md-surface-container-highest: #3c3c5a;
+  --md-surface-variant: #30304a;
   --md-on-surface: #e3e3e3;
   --md-on-surface-variant: #9aa0a6;
-  --md-outline: #5f6368;
-  --md-outline-variant: #3c4043;
+  --md-outline: #4a4a60;
+  --md-outline-variant: #35354a;
 
   --md-error: #f28b82;
   --md-error-container: #8c1d18;
@@ -132,9 +148,9 @@
   --bg-surface: var(--md-surface-container-low);
   --bg-input: var(--md-surface-container);
 
-  --accent-primary: var(--md-primary);
+  --accent-primary: #8ab4f8;
   --accent-primary-hover: #aecbfa;
-  --accent-secondary: var(--md-tertiary);
+  --accent-secondary: #81c995;
   --accent-gradient: linear-gradient(135deg, #8ab4f8 0%, #4285f4 100%);
   --accent-glow: rgba(138, 180, 248, 0.1);
   --accent-glow-strong: rgba(138, 180, 248, 0.2);
@@ -142,8 +158,8 @@
   --text-primary: var(--md-on-surface);
   --text-secondary: var(--md-on-surface-variant);
   --text-tertiary: #5f6368;
-  --text-accent: var(--md-primary);
-  --text-on-accent: var(--md-on-primary);
+  --text-accent: #8ab4f8;
+  --text-on-accent: #1a3a5c;
 
   --border-subtle: transparent;
   --border-default: var(--md-outline-variant);
@@ -172,6 +188,7 @@ html {
 
 body {
   font-family: var(--font-sans);
+  font-size: 12px;
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
@@ -180,7 +197,7 @@ body {
   transition: background-color var(--transition-slow), color var(--transition-slow);
 }
 
-/* ─── Scrollbar (M3 style — thin, tonal) ─── */
+/* ─── Scrollbar ─── */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
@@ -216,13 +233,12 @@ input, select, textarea {
   outline: none;
 }
 
-/* ─── M3 Utility Classes ─── */
+/* ─── Card Utilities ─── */
 
 .glass-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-default);
+  border: 2px solid #d0ccc4;
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
 }
 
 .glass-card-hover {
@@ -237,8 +253,7 @@ input, select, textarea {
 }
 
 .accent-border {
-  border: 1px solid var(--border-accent);
-  box-shadow: var(--shadow-glow);
+  border: 2px solid var(--color-blue-dark);
 }
 
 .gradient-text {
@@ -248,13 +263,13 @@ input, select, textarea {
   background-clip: text;
 }
 
-/* ─── M3 Theme Toggle (Pill) ─── */
+/* ─── Theme Toggle ─── */
 .themeToggleBtn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-full);
   background: transparent;
   color: var(--text-secondary);
@@ -284,8 +299,8 @@ input, select, textarea {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 12px rgba(26, 115, 232, 0.08); }
-  50% { box-shadow: 0 0 24px rgba(26, 115, 232, 0.16); }
+  0%, 100% { box-shadow: 0 0 12px rgba(26, 58, 92, 0.08); }
+  50% { box-shadow: 0 0 24px rgba(26, 58, 92, 0.16); }
 }
 
 @keyframes float {
@@ -312,12 +327,12 @@ input, select, textarea {
   top: -30%; left: -30%;
   width: 160%; height: 160%;
   background:
-    radial-gradient(ellipse at 25% 40%, var(--md-primary-container) 0%, transparent 50%);
+    radial-gradient(ellipse at 25% 40%, var(--color-blue-light) 0%, transparent 50%);
   opacity: 0.15;
   pointer-events: none;
 }
 
-/* ─── Toast (M3 Snackbar) ─── */
+/* ─── Toast (Snackbar) ─── */
 .toast-container {
   position: fixed;
   bottom: 24px;
@@ -332,20 +347,20 @@ input, select, textarea {
 .toast {
   padding: 14px 24px;
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   display: flex;
   align-items: center;
   gap: 10px;
   animation: fadeIn 0.2s ease-out;
-  background: var(--md-on-surface);
-  color: var(--md-surface);
+  background: var(--brand-header);
+  color: #ffffff;
   box-shadow: var(--shadow-lg);
   border: none;
 }
 
 .toast-success {
-  background: var(--md-on-surface);
+  background: var(--brand-header);
   border-left: none;
 }
 

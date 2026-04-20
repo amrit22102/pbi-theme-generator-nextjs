@@ -33,7 +33,7 @@ export default function HomePage() {
       <nav className={styles.navbar}>
         <div className={styles.navLogo}>
           <div className={styles.navLogoIcon}>⚡</div>
-          <span className="gradient-text">Theme Studio</span>
+          <span>Theme Studio</span>
         </div>
         <div className={styles.navRight}>
           <ThemeToggle />

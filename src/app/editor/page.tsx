@@ -382,7 +382,7 @@ export default function EditorPage() {
         <div className={styles.sidebarHeader}>
           <div className={styles.sidebarLogo} onClick={() => router.push('/')}>
             <div className={styles.sidebarLogoIcon}>⚡</div>
-            <span className="gradient-text">Theme Studio</span>
+            <span>Theme Studio</span>
           </div>
           <div className={styles.sidebarHeaderActions}>
             <ThemeToggle />

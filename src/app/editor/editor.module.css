@@ -1,4 +1,4 @@
-/* ─── Editor — Material You ─── */
+/* ─── Editor — Corporate Style ─── */
 
 .editorLayout {
   display: flex;
@@ -11,8 +11,8 @@
   width: 360px;
   min-width: 360px;
   height: 100vh;
-  background: var(--md-surface-dim);
-  border-right: 1px solid var(--border-default);
+  background: #ffffff;
+  border-right: 2px solid #d0ccc4;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -20,10 +20,12 @@
 }
 
 .sidebarHeader {
-  padding: 12px 16px;
+  padding: 0 16px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: #1a3a5c;
 }
 
 .sidebarLogo {
@@ -32,19 +34,20 @@
   gap: 10px;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
+  color: #ffffff;
 }
 
 .sidebarLogoIcon {
-  width: 36px; height: 36px;
-  border-radius: var(--radius-full);
-  background: var(--md-primary-container);
-  color: var(--md-on-primary-container);
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .sidebarHeaderActions {
@@ -53,20 +56,30 @@
   gap: 4px;
 }
 
+.sidebarHeaderActions :global(.themeToggleBtn) {
+  color: #ffffff;
+}
+
+.sidebarHeaderActions :global(.themeToggleBtn:hover) {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
 .headerBtn {
-  padding: 8px 16px;
-  border-radius: var(--radius-full);
-  font-size: 13px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 11px;
   font-weight: 500;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   transition: all var(--transition-fast);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85);
   background: transparent;
 }
 
 .headerBtn:hover {
-  color: var(--text-primary);
-  background: var(--md-surface-container);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .sidebarScroll {
@@ -91,19 +104,18 @@
 
 .themeNameInput {
   width: 100%;
-  padding: 14px 16px;
-  border-radius: var(--radius-sm);
-  background: var(--md-surface-container-low);
-  border: 1px solid var(--border-default);
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 2px solid #d0ccc4;
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast);
 }
 
 .themeNameInput:focus {
-  border-color: var(--md-primary);
-  box-shadow: 0 0 0 2px var(--accent-glow);
+  border-color: var(--color-blue-dark);
 }
 
 /* ─── Accordion Panel (M3 elevated cards) ─── */
@@ -125,7 +137,7 @@
 }
 
 .panelHeader:hover {
-  background: var(--md-surface-container-low);
+  background: var(--color-blue-light);
 }
 
 .panelHeaderLeft {
@@ -140,9 +152,9 @@
 
 .panelTitle {
   font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a3a5c;
 }
 
 .panelChevron {
@@ -376,19 +388,18 @@
 /* ─── Export Panel ─── */
 .exportSection {
   padding: 16px;
-  border-top: 1px solid var(--border-default);
+  border-top: 2px solid #d0ccc4;
 }
 
 .exportBtn {
   width: 100%;
-  padding: 16px;
-  border-radius: var(--radius-full);
-  background: var(--md-primary);
-  color: var(--md-on-primary);
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: #1a3a5c;
+  color: #ffffff;
   font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.2px;
+  font-size: 13px;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -398,8 +409,7 @@
 }
 
 .exportBtn:hover {
-  box-shadow: var(--shadow-glow-strong);
-  opacity: 0.92;
+  background: #2a5a8c;
 }
 
 .exportPreview {
@@ -443,19 +453,21 @@
 }
 
 .previewHeader {
-  padding: 14px 24px;
-  border-bottom: 1px solid var(--border-default);
+  padding: 0 24px;
+  height: 48px;
+  border-bottom: 2px solid #d0ccc4;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--md-surface-dim);
+  background: #1a3a5c;
+  color: #ffffff;
 }
 
 .previewHeaderTitle {
   font-family: var(--font-display);
   font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .chartChips {
@@ -806,13 +818,13 @@
 
 /* ─── JSON Preview Toggle Button (in main panel) ─── */
 .jsonToggleBtn {
-  padding: 8px 16px;
-  border-radius: var(--radius-full);
-  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 500;
-  border: 1px solid var(--md-outline);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   background: transparent;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -822,14 +834,14 @@
 }
 
 .jsonToggleBtn:hover {
-  background: var(--md-surface-container-low);
-  color: var(--text-primary);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .jsonToggleBtnActive {
-  background: var(--md-primary-container);
-  border-color: transparent;
-  color: var(--md-on-primary-container);
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* ─── JSON Preview Footer ─── */
@@ -851,12 +863,13 @@
 
 /* ─── Main panel header bar ─── */
 .mainPanelHeader {
-  padding: 12px 20px;
-  border-bottom: 1px solid var(--border-default);
+  padding: 0 20px;
+  height: 48px;
+  border-bottom: 2px solid #d0ccc4;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  background: var(--md-surface-dim);
+  background: #1a3a5c;
   flex-shrink: 0;
   gap: 8px;
 }

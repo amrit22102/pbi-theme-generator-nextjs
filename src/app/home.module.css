@@ -144,13 +144,19 @@
 /* ─── CTA Cards ─── */
 .ctaGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  max-width: 700px;
+  max-width: 960px;
   margin: 0 auto 80px;
   position: relative;
   z-index: 1;
   padding: 0 32px;
+}
+
+@media (max-width: 768px) {
+  .ctaGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .ctaCard {
@@ -192,6 +198,13 @@
 .ctaCustom .ctaIcon {
   background: var(--md-tertiary-container);
   color: var(--md-tertiary);
+}
+
+.ctaLive::before { display: none; }
+
+.ctaLive .ctaIcon {
+  background: linear-gradient(135deg, rgba(26, 115, 232, 0.15), rgba(138, 180, 248, 0.15));
+  color: var(--md-primary);
 }
 
 .ctaTitle {

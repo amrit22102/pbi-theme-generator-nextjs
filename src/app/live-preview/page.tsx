@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { HexColorPicker } from 'react-colorful';
@@ -310,6 +310,60 @@ export default function LivePreviewPage() {
   const [pbixExporting, setPbixExporting] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
 
+  // ─── Workspace & Report Selection ───
+  const [workspaces, setWorkspaces] = useState<{ id: string; name: string }[]>([]);
+  const [reports, setReports] = useState<{ id: string; name: string }[]>([]);
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('');
+  const [selectedReportId, setSelectedReportId] = useState('');
+  const [workspacesLoading, setWorkspacesLoading] = useState(true);
+  const [reportsLoading, setReportsLoading] = useState(false);
+
+  // Fetch workspaces on mount
+  useEffect(() => {
+    async function loadWorkspaces() {
+      setWorkspacesLoading(true);
+      try {
+        const res = await fetch('/api/powerbi/workspaces');
+        if (res.ok) {
+          const data = await res.json();
+          setWorkspaces(data.workspaces || []);
+        }
+      } catch (err) {
+        console.error('Failed to load workspaces:', err);
+      } finally {
+        setWorkspacesLoading(false);
+      }
+    }
+    loadWorkspaces();
+  }, []);
+
+  // Fetch reports whenever workspace changes
+  useEffect(() => {
+    if (!selectedWorkspaceId) {
+      setReports([]);
+      setSelectedReportId('');
+      return;
+    }
+
+    async function loadReports() {
+      setReportsLoading(true);
+      setReports([]);
+      setSelectedReportId('');
+      try {
+        const res = await fetch(`/api/powerbi/reports?workspaceId=${selectedWorkspaceId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setReports(data.reports || []);
+        }
+      } catch (err) {
+        console.error('Failed to load reports:', err);
+      } finally {
+        setReportsLoading(false);
+      }
+    }
+    loadReports();
+  }, [selectedWorkspaceId]);
+
   const showToast = useCallback((type: 'success' | 'error', msg: string) => {
     setToast({ type, msg });
     setTimeout(() => setToast(null), 3000);
@@ -374,6 +428,54 @@ export default function LivePreviewPage() {
             <button className={styles.headerBtn} onClick={resetToDefault}>
               Reset
             </button>
+          </div>
+        </div>
+
+        {/* ─── Workspace & Report Picker ─── */}
+        <div className={styles.reportPickerSection}>
+          <div className={styles.reportPickerRow}>
+            <div className={styles.reportPickerField}>
+              <div className={styles.reportPickerLabel}>Workspace</div>
+              <select
+                className={styles.reportPickerSelect}
+                value={selectedWorkspaceId}
+                onChange={(e) => setSelectedWorkspaceId(e.target.value)}
+                disabled={workspacesLoading}
+                id="live-workspace-select"
+              >
+                <option value="">
+                  {workspacesLoading ? 'Loading...' : 'Select Workspace'}
+                </option>
+                {workspaces.map((ws) => (
+                  <option key={ws.id} value={ws.id}>
+                    {ws.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.reportPickerField}>
+              <div className={styles.reportPickerLabel}>Report</div>
+              <select
+                className={styles.reportPickerSelect}
+                value={selectedReportId}
+                onChange={(e) => setSelectedReportId(e.target.value)}
+                disabled={!selectedWorkspaceId || reportsLoading}
+                id="live-report-select"
+              >
+                <option value="">
+                  {reportsLoading
+                    ? 'Loading...'
+                    : !selectedWorkspaceId
+                      ? 'Select workspace first'
+                      : 'Select Report'}
+                </option>
+                {reports.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -697,7 +799,11 @@ export default function LivePreviewPage() {
         {/* Report + optional JSON panel */}
         <div className={styles.reportContainer}>
           <div className={styles.reportEmbed}>
-            <PowerBIEmbed themeJson={exportJSON} />
+            <PowerBIEmbed
+              themeJson={exportJSON}
+              workspaceId={selectedWorkspaceId}
+              reportId={selectedReportId}
+            />
           </div>
 
           {showJsonPreview && (

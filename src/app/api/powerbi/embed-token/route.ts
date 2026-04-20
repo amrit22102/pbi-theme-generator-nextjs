@@ -1,11 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * POST /api/powerbi/embed-token
  *
  * Server-side only — authenticates with Azure AD using a Service Principal,
  * then calls the Power BI REST API to generate an embed token for the
- * configured report.
+ * specified report.
+ *
+ * Body: { workspaceId?: string, reportId?: string }
+ *   Falls back to env vars if not provided.
  *
  * Returns: { embedToken, embedUrl, reportId, expiry }
  */
@@ -13,8 +16,6 @@ import { NextResponse } from 'next/server';
 const TENANT_ID = process.env.AZURE_TENANT_ID!;
 const CLIENT_ID = process.env.AZURE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.AZURE_CLIENT_SECRET!;
-const WORKSPACE_ID = process.env.POWERBI_WORKSPACE_ID!;
-const REPORT_ID = process.env.POWERBI_REPORT_ID!;
 
 interface AzureTokenResponse {
   access_token: string;
@@ -42,7 +43,6 @@ let cachedAzureToken: { token: string; expiresAt: number } | null = null;
  * Step 1: Get an Azure AD access token using the Service Principal.
  */
 async function getAzureADToken(): Promise<string> {
-  // Return cached token if still valid (with 2 minute buffer)
   if (cachedAzureToken && Date.now() < cachedAzureToken.expiresAt - 120_000) {
     return cachedAzureToken.token;
   }
@@ -70,7 +70,6 @@ async function getAzureADToken(): Promise<string> {
 
   const data: AzureTokenResponse = await response.json();
 
-  // Cache the token
   cachedAzureToken = {
     token: data.access_token,
     expiresAt: Date.now() + data.expires_in * 1000,
@@ -82,8 +81,12 @@ async function getAzureADToken(): Promise<string> {
 /**
  * Step 2: Get report details (embedUrl) from Power BI REST API.
  */
-async function getReportDetails(azureToken: string): Promise<PBIReportResponse> {
-  const url = `https://api.powerbi.com/v1.0/myorg/groups/${WORKSPACE_ID}/reports/${REPORT_ID}`;
+async function getReportDetails(
+  azureToken: string,
+  workspaceId: string,
+  reportId: string
+): Promise<PBIReportResponse> {
+  const url = `https://api.powerbi.com/v1.0/myorg/groups/${workspaceId}/reports/${reportId}`;
 
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${azureToken}` },
@@ -101,8 +104,12 @@ async function getReportDetails(azureToken: string): Promise<PBIReportResponse> 
 /**
  * Step 3: Generate an embed token for the report.
  */
-async function generateEmbedToken(azureToken: string): Promise<PBIEmbedTokenResponse> {
-  const url = `https://api.powerbi.com/v1.0/myorg/groups/${WORKSPACE_ID}/reports/${REPORT_ID}/GenerateToken`;
+async function generateEmbedToken(
+  azureToken: string,
+  workspaceId: string,
+  reportId: string
+): Promise<PBIEmbedTokenResponse> {
+  const url = `https://api.powerbi.com/v1.0/myorg/groups/${workspaceId}/reports/${reportId}/GenerateToken`;
 
   const response = await fetch(url, {
     method: 'POST',
@@ -122,33 +129,40 @@ async function generateEmbedToken(azureToken: string): Promise<PBIEmbedTokenResp
   return response.json();
 }
 
-export async function POST() {
-  // Validate environment variables
-  if (!TENANT_ID || !CLIENT_ID || !CLIENT_SECRET || !WORKSPACE_ID || !REPORT_ID) {
+export async function POST(request: NextRequest) {
+  // Validate Azure credentials
+  if (!TENANT_ID || !CLIENT_ID || !CLIENT_SECRET) {
     return NextResponse.json(
-      {
-        error: 'Power BI configuration is incomplete. Please set all required environment variables.',
-        missingVars: {
-          AZURE_TENANT_ID: !TENANT_ID,
-          AZURE_CLIENT_ID: !CLIENT_ID,
-          AZURE_CLIENT_SECRET: !CLIENT_SECRET,
-          POWERBI_WORKSPACE_ID: !WORKSPACE_ID,
-          POWERBI_REPORT_ID: !REPORT_ID,
-        },
-      },
+      { error: 'Azure credentials are not configured in environment variables.' },
       { status: 500 }
     );
   }
 
+  // Read workspace/report IDs from body, fall back to env vars
+  let workspaceId = process.env.POWERBI_WORKSPACE_ID || '';
+  let reportId = process.env.POWERBI_REPORT_ID || '';
+
   try {
-    // 1. Authenticate with Azure AD
+    const body = await request.json();
+    if (body.workspaceId) workspaceId = body.workspaceId;
+    if (body.reportId) reportId = body.reportId;
+  } catch {
+    // Body may be empty — that's fine, use env var defaults
+  }
+
+  if (!workspaceId || !reportId) {
+    return NextResponse.json(
+      {
+        error: 'No workspace or report selected. Please select a workspace and report from the sidebar.',
+      },
+      { status: 400 }
+    );
+  }
+
+  try {
     const azureToken = await getAzureADToken();
-
-    // 2. Get report details (for embedUrl)
-    const report = await getReportDetails(azureToken);
-
-    // 3. Generate embed token
-    const embedToken = await generateEmbedToken(azureToken);
+    const report = await getReportDetails(azureToken, workspaceId, reportId);
+    const embedToken = await generateEmbedToken(azureToken, workspaceId, reportId);
 
     return NextResponse.json({
       embedToken: embedToken.token,

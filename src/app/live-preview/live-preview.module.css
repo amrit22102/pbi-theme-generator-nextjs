@@ -80,6 +80,62 @@
   border-color: var(--border-hover);
 }
 
+/* ─── Workspace & Report Picker ─── */
+.reportPickerSection {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-default);
+  flex-shrink: 0;
+}
+
+.reportPickerRow {
+  display: flex;
+  gap: 10px;
+}
+
+.reportPickerField {
+  flex: 1;
+  min-width: 0;
+}
+
+.reportPickerLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--md-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+
+.reportPickerSelect {
+  width: 100%;
+  padding: 9px 28px 9px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3e%3cpath fill='%239aa0a6' d='M3 5l3 3 3-3'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reportPickerSelect:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.reportPickerSelect:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ─── Theme Name ─── */
 .themeNameSection {
   padding: 12px 16px;

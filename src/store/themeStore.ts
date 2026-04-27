@@ -17,6 +17,7 @@ interface ThemeState {
   setForegroundTertiary: (color: string) => void;
   setBackground: (color: string) => void;
   setPrimaryDataColor: (color: string) => void;
+  setSecondaryDataColor: (color: string) => void;
   setStatusColor: (type: 'good' | 'neutral' | 'bad', color: string) => void;
   setAccentColor: (type: 'tableAccent' | 'maximum' | 'center' | 'minimum', color: string) => void;
   setFont: (font: Partial<ThemeCustomization['font']>) => void;
@@ -94,6 +95,18 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     set((s) => {
       const newColors = [...s.customization.colors.dataColors];
       newColors[0] = color;
+      return {
+        customization: {
+          ...s.customization,
+          colors: { ...s.customization.colors, dataColors: newColors },
+        },
+      };
+    }),
+
+  setSecondaryDataColor: (color) =>
+    set((s) => {
+      const newColors = [...s.customization.colors.dataColors];
+      newColors[1] = color;
       return {
         customization: {
           ...s.customization,

@@ -9,25 +9,25 @@ import { ThemeCustomization, ChartType } from '@/types/theme';
  * Some map to multiple keys (e.g. slicerVisual -> slicer + advancedSlicerVisual).
  */
 const CHART_TO_VISUAL_KEYS: Record<ChartType, string[]> = {
-  columnChart:          ['columnChart'],
+  columnChart: ['columnChart'],
   clusteredColumnChart: ['clusteredColumnChart'],
-  barChart:             ['barChart'],
-  clusteredBarChart:    ['clusteredBarChart'],
-  lineChart:            ['lineChart'],
-  areaChart:            ['areaChart'],
-  stackedAreaChart:     ['stackedAreaChart'],
-  pieChart:             ['pieChart'],
-  donutChart:           ['donutChart'],
-  scatterPlot:          ['scatterChart'],
-  kpiCard:              ['kpi'],
-  cardVisual:           ['cardVisual'],
-  matrixTable:          ['pivotTable'],
-  slicerVisual:         ['slicer', 'advancedSlicerVisual'],
-  waterfallChart:       ['waterfallChart'],
-  ribbonChart:          ['ribbonChart'],
-  treemapChart:         ['treemapChart'],
-  funnelChart:          ['funnelChart'],
-  gaugeChart:           ['gaugeChart'],
+  barChart: ['barChart'],
+  clusteredBarChart: ['clusteredBarChart'],
+  lineChart: ['lineChart'],
+  areaChart: ['areaChart'],
+  stackedAreaChart: ['stackedAreaChart'],
+  pieChart: ['pieChart'],
+  donutChart: ['donutChart'],
+  scatterPlot: ['scatterChart'],
+  kpiCard: ['kpi'],
+  cardVisual: ['cardVisual'],
+  matrixTable: ['pivotTable'],
+  slicerVisual: ['slicer', 'advancedSlicerVisual'],
+  waterfallChart: ['waterfallChart'],
+  ribbonChart: ['ribbonChart'],
+  treemapChart: ['treemapChart'],
+  funnelChart: ['funnelChart'],
+  gaugeChart: ['gaugeChart'],
 };
 
 export const DEFAULT_CUSTOMIZATION: ThemeCustomization = {
@@ -228,7 +228,11 @@ export function buildExportJSON(customization: ThemeCustomization, selectedChart
       callout: customization.textClasses.callout,
       title: customization.textClasses.title,
       header: customization.textClasses.header,
-      label: customization.textClasses.label,
+      label: {
+        fontSize: customization.textClasses.label.fontSize,
+        fontFace: customization.textClasses.label.fontFace,
+        color: customization.colors.foreground, // Lock to foreground to avoid spilling into textboxes
+      },
     },
     visualStyles: buildVisualStyles(customization, selectedCharts),
   };
@@ -251,92 +255,136 @@ function buildVisualStyles(customization: ThemeCustomization, selectedCharts: Ch
 
   /* ── Build visual styles using live customization values ── */
   const allVisualStyles: Record<string, unknown> = {
-    scatterChart: { '*': {
-      bubbles: [{ bubbleSize: vc('scatterPlot', 'bubbleSize', -10), markerRangeType: vc('scatterPlot', 'markerRangeType', 'auto') }],
-      general: [{ responsive: true }],
-      fillPoint: [{ show: vc('scatterPlot', 'fillPoint', true) }],
-      legend: [{ show: vc('scatterPlot', 'showLegend', true), showGradientLegend: true }],
-    } },
-    lineChart: { '*': {
-      general: [{ responsive: true }],
-      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
-      forecast: [{ matchSeriesInterpolation: vc('lineChart', 'matchSeriesInterpolation', true) }],
-      legend: [{ show: vc('lineChart', 'showLegend', true) }],
-    } },
-    pieChart: { '*': {
-      legend: [{ show: vc('pieChart', 'showLegend', customization.legend.show), position: customization.legend.position }],
-      labels: [{ labelStyle: vc('pieChart', 'labelStyle', 'Data value, percent of total') }],
-    } },
-    donutChart: { '*': {
-      legend: [{ show: vc('donutChart', 'showLegend', customization.legend.show), position: customization.legend.position }],
-      labels: [{ labelStyle: vc('donutChart', 'labelStyle', 'Data value, percent of total') }],
-    } },
-    pivotTable: { '*': {
-      rowHeaders: [{
-        showExpandCollapseButtons: vc('matrixTable', 'showExpandCollapseButtons', true),
-        legacyStyleDisabled: vc('matrixTable', 'legacyStyleDisabled', true),
-      }],
-    } },
+    scatterChart: {
+      '*': {
+        bubbles: [{ bubbleSize: vc('scatterPlot', 'bubbleSize', -10), markerRangeType: vc('scatterPlot', 'markerRangeType', 'auto') }],
+        general: [{ responsive: true }],
+        fillPoint: [{ show: vc('scatterPlot', 'fillPoint', true) }],
+        legend: [{ show: vc('scatterPlot', 'showLegend', true), showGradientLegend: true }],
+      }
+    },
+    lineChart: {
+      '*': {
+        general: [{ responsive: true }],
+        smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+        forecast: [{ matchSeriesInterpolation: vc('lineChart', 'matchSeriesInterpolation', true) }],
+        legend: [{ show: vc('lineChart', 'showLegend', true) }],
+      }
+    },
+    pieChart: {
+      '*': {
+        legend: [{ show: vc('pieChart', 'showLegend', customization.legend.show), position: customization.legend.position }],
+        labels: [{ labelStyle: vc('pieChart', 'labelStyle', 'Data value, percent of total') }],
+      }
+    },
+    donutChart: {
+      '*': {
+        legend: [{ show: vc('donutChart', 'showLegend', customization.legend.show), position: customization.legend.position }],
+        labels: [{ labelStyle: vc('donutChart', 'labelStyle', 'Data value, percent of total') }],
+      }
+    },
+    pivotTable: {
+      '*': {
+        rowHeaders: [{
+          showExpandCollapseButtons: vc('matrixTable', 'showExpandCollapseButtons', true),
+          legacyStyleDisabled: vc('matrixTable', 'legacyStyleDisabled', true),
+          fontFamily: customization.textClasses.header.fontFace,
+          fontSize: customization.textClasses.header.fontSize,
+          fontColor: { solid: { color: customization.textClasses.header.color } },
+        }],
+        columnHeaders: [{
+          fontFamily: customization.textClasses.header.fontFace,
+          fontSize: customization.textClasses.header.fontSize,
+          fontColor: { solid: { color: customization.textClasses.header.color } },
+        }],
+        values: [{
+          fontFamily: customization.textClasses.label.fontFace,
+          fontSize: customization.textClasses.label.fontSize,
+          fontColor: { solid: { color: customization.textClasses.label.color } },
+        }],
+      }
+    },
     multiRowCard: { '*': { card: [{ outlineWeight: 2, barShow: true, barWeight: 2 }] } },
-    kpi: { '*': {
-      trendline: [{ transparency: vc('kpiCard', 'trendlineTransparency', 20) }],
-    } },
-    cardVisual: { '*': {
-      layout: [
-        { maxTiles: vc('cardVisual', 'maxTiles', 3) },
-        { $id: 'default', cellPadding: vc('cardVisual', 'cellPadding', 12), paddingIndividual: false, paddingUniform: vc('cardVisual', 'cellPadding', 12), backgroundShow: vc('cardVisual', 'backgroundShow', true) },
-      ],
-      overflow: [{ type: 0 }],
-      image: [{ $id: 'default', position: 'Left', imageAreaSize: 20, padding: 12, rectangleRoundedCurve: 4, fit: 'Normal', fixedSize: false }],
-      referenceLabel: [{ $id: 'default', backgroundColor: { solid: { color: 'backgroundLight' } }, paddingUniform: 12, rectangleRoundedCurveCustomStyle: true, rectangleRoundedCurveLeftBottom: 4, rectangleRoundedCurveRightBottom: 4 }],
-      value: [{ $id: 'default', fontFamily: "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif" }],
-      label: [{ $id: 'default', position: 'belowValue', fontColor: { solid: { color: 'foregroundNeutralSecondary' } } }],
-      spacing: [{ $id: 'default', verticalSpacing: 2 }],
-      padding: [{ $id: 'default', paddingUniform: 12, paddingIndividual: false }],
-    } },
+    kpi: {
+      '*': {
+        trendline: [{ transparency: vc('kpiCard', 'trendlineTransparency', 20) }],
+        indicator: [{ fontFamily: customization.textClasses.callout.fontFace, fontSize: customization.textClasses.callout.fontSize, fontColor: { solid: { color: customization.textClasses.callout.color } } }],
+      }
+    },
+    cardVisual: {
+      '*': {
+        layout: [
+          { maxTiles: vc('cardVisual', 'maxTiles', 3) },
+          { $id: 'default', cellPadding: vc('cardVisual', 'cellPadding', 12), paddingIndividual: false, paddingUniform: vc('cardVisual', 'cellPadding', 12), backgroundShow: vc('cardVisual', 'backgroundShow', true) },
+        ],
+        overflow: [{ type: 0 }],
+        image: [{ $id: 'default', position: 'Left', imageAreaSize: 20, padding: 12, rectangleRoundedCurve: 4, fit: 'Normal', fixedSize: false }],
+        referenceLabel: [{ $id: 'default', backgroundColor: { solid: { color: 'backgroundLight' } }, paddingUniform: 12, rectangleRoundedCurveCustomStyle: true, rectangleRoundedCurveLeftBottom: 4, rectangleRoundedCurveRightBottom: 4 }],
+        value: [{ $id: 'default', fontFamily: `'${customization.textClasses.callout.fontFace}', wf_segoe-ui_semibold, helvetica, arial, sans-serif`, fontSize: customization.textClasses.callout.fontSize, fontColor: { solid: { color: customization.textClasses.callout.color } } }],
+        label: [{ $id: 'default', position: 'belowValue', fontFamily: customization.textClasses.label.fontFace, fontSize: customization.textClasses.label.fontSize, fontColor: { solid: { color: customization.textClasses.label.color } } }],
+        spacing: [{ $id: 'default', verticalSpacing: 2 }],
+        padding: [{ $id: 'default', paddingUniform: 12, paddingIndividual: false }],
+      }
+    },
     advancedSlicerVisual: { '*': { layout: [{ maxTiles: 3 }], shapeCustomRectangle: [{ $id: 'default', tileShape: 'rectangleRoundedByPixel', rectangleRoundedCurve: 4 }], selectionIcon: [{ $id: 'default', size: 12 }] } },
-    slicer: { '*': {
-      general: [{ responsive: vc('slicerVisual', 'responsive', true) }],
-      date: [{ hideDatePickerButton: vc('slicerVisual', 'hideDatePickerButton', false) }],
-      items: [{ padding: vc('slicerVisual', 'itemPadding', 4), accessibilityContrastProperties: true }],
-    } },
+    slicer: {
+      '*': {
+        general: [{ responsive: vc('slicerVisual', 'responsive', true) }],
+        date: [{ hideDatePickerButton: vc('slicerVisual', 'hideDatePickerButton', false) }],
+        items: [{ padding: vc('slicerVisual', 'itemPadding', 4), accessibilityContrastProperties: true, fontFamily: customization.textClasses.label.fontFace, fontSize: customization.textClasses.label.fontSize, fontColor: { solid: { color: customization.textClasses.label.color } } }],
+      }
+    },
     waterfallChart: { '*': { general: [{ responsive: true }], legend: [{ show: vc('waterfallChart', 'showLegend', true) }] } },
-    columnChart: { '*': {
-      general: [{ responsive: true }],
-      legend: [{ show: vc('columnChart', 'showLegend', true), showGradientLegend: vc('columnChart', 'showGradientLegend', true) }],
-      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
-    } },
-    clusteredColumnChart: { '*': {
-      general: [{ responsive: true }],
-      legend: [{ show: vc('clusteredColumnChart', 'showLegend', true), showGradientLegend: vc('clusteredColumnChart', 'showGradientLegend', true) }],
-      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
-    } },
-    barChart: { '*': {
-      general: [{ responsive: true }],
-      legend: [{ show: vc('barChart', 'showLegend', true), showGradientLegend: true }],
-      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
-    } },
-    clusteredBarChart: { '*': {
-      general: [{ responsive: true }],
-      legend: [{ show: vc('clusteredBarChart', 'showLegend', true), showGradientLegend: true }],
-      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
-    } },
-    areaChart: { '*': {
-      general: [{ responsive: true }],
-      legend: [{ show: vc('areaChart', 'showLegend', true) }],
-      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
-    } },
-    stackedAreaChart: { '*': {
-      general: [{ responsive: true }],
-      legend: [{ show: vc('stackedAreaChart', 'showLegend', true) }],
-      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
-    } },
-    ribbonChart: { '*': {
-      general: [{ responsive: true }],
-      legend: [{ show: vc('ribbonChart', 'showLegend', true) }],
-      smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
-      valueAxis: [{ show: true }],
-    } },
+    columnChart: {
+      '*': {
+        general: [{ responsive: true }],
+        legend: [{ show: vc('columnChart', 'showLegend', true), showGradientLegend: vc('columnChart', 'showGradientLegend', true) }],
+        smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+      }
+    },
+    clusteredColumnChart: {
+      '*': {
+        general: [{ responsive: true }],
+        legend: [{ show: vc('clusteredColumnChart', 'showLegend', true), showGradientLegend: vc('clusteredColumnChart', 'showGradientLegend', true) }],
+        smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+      }
+    },
+    barChart: {
+      '*': {
+        general: [{ responsive: true }],
+        legend: [{ show: vc('barChart', 'showLegend', true), showGradientLegend: true }],
+        smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+      }
+    },
+    clusteredBarChart: {
+      '*': {
+        general: [{ responsive: true }],
+        legend: [{ show: vc('clusteredBarChart', 'showLegend', true), showGradientLegend: true }],
+        smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+      }
+    },
+    areaChart: {
+      '*': {
+        general: [{ responsive: true }],
+        legend: [{ show: vc('areaChart', 'showLegend', true) }],
+        smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+      }
+    },
+    stackedAreaChart: {
+      '*': {
+        general: [{ responsive: true }],
+        legend: [{ show: vc('stackedAreaChart', 'showLegend', true) }],
+        smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+      }
+    },
+    ribbonChart: {
+      '*': {
+        general: [{ responsive: true }],
+        legend: [{ show: vc('ribbonChart', 'showLegend', true) }],
+        smallMultiplesLayout: [{ backgroundTransparency: 0, gridLineType: 'inner' }],
+        valueAxis: [{ show: true }],
+      }
+    },
     treemapChart: { '*': { general: [{ responsive: true }], legend: [{ show: vc('treemapChart', 'showLegend', true) }] } },
     funnelChart: { '*': { general: [{ responsive: true }], legend: [{ show: vc('funnelChart', 'showLegend', true) }] } },
     gaugeChart: { '*': { general: [{ responsive: true }], legend: [{ show: vc('gaugeChart', 'showLegend', true) }] } },
@@ -352,7 +400,7 @@ function buildVisualStyles(customization: ThemeCustomization, selectedCharts: Ch
     actionButton: { '*': { background: [{ show: false }], visualHeader: [{ show: false }] } },
     pageNavigator: { '*': { background: [{ show: false }], visualHeader: [{ show: false }] } },
     bookmarkNavigator: { '*': { background: [{ show: false }], visualHeader: [{ show: false }] } },
-    textbox: { '*': { general: [{ keepLayerOrder: true }], visualHeader: [{ show: false }] } },
+    textbox: { '*': { general: [{ keepLayerOrder: true }], visualHeader: [{ show: false }], '*': [{ fontColor: { solid: { color: '#000000' } } }] } },
     page: { '*': { outspace: [{ color: { solid: { color: '#FFFFFF' } } }], background: [{ transparency: 100 }] } },
   };
 
@@ -363,18 +411,20 @@ function buildVisualStyles(customization: ThemeCustomization, selectedCharts: Ch
         line: [{ transparency: 0 }],
         outline: [{ transparency: 0 }],
         plotArea: [{ transparency: 0 }],
-        categoryAxis: [{ showAxisTitle: customization.xAxis.showAxisTitle, gridlineStyle: customization.xAxis.gridlineStyle === 'none' ? 'dotted' : customization.xAxis.gridlineStyle, concatenateLabels: false }],
-        valueAxis: [{ showAxisTitle: customization.yAxis.showAxisTitle, gridlineStyle: customization.yAxis.gridlineStyle === 'none' ? 'dotted' : customization.yAxis.gridlineStyle }],
+        categoryAxis: [{ showAxisTitle: customization.xAxis.showAxisTitle, gridlineStyle: customization.xAxis.gridlineStyle === 'none' ? 'dotted' : customization.xAxis.gridlineStyle, concatenateLabels: false, fontFamily: customization.textClasses.label.fontFace, fontSize: customization.textClasses.label.fontSize, labelColor: { solid: { color: customization.textClasses.label.color } } }],
+        valueAxis: [{ showAxisTitle: customization.yAxis.showAxisTitle, gridlineStyle: customization.yAxis.gridlineStyle === 'none' ? 'dotted' : customization.yAxis.gridlineStyle, fontFamily: customization.textClasses.label.fontFace, fontSize: customization.textClasses.label.fontSize, labelColor: { solid: { color: customization.textClasses.label.color } } }],
         y2Axis: [{ show: true }],
-        title: [{ titleWrap: true }],
+        title: [{ titleWrap: true, fontFamily: customization.textClasses.title.fontFace, fontSize: customization.textClasses.title.fontSize, fontColor: { solid: { color: customization.textClasses.title.color } } }],
+        legend: [{ labelColor: { solid: { color: customization.textClasses.label.color } }, fontFamily: customization.textClasses.label.fontFace, fontSize: customization.textClasses.label.fontSize }],
+        visualTooltip: [{ titleFontColor: { solid: { color: customization.textClasses.title.color } }, valueFontColor: { solid: { color: customization.textClasses.label.color } } }],
         lineStyles: [{ strokeWidth: 3 }],
         wordWrap: [{ show: true }],
-        background: [{ show: true, transparency: 0 }],
+        background: [{ show: true, transparency: 0, color: { solid: { color: customization.colors.background } } }],
         border: [{ width: 1 }],
-        outspacePane: [{ backgroundColor: { solid: { color: '#ffffff' } }, transparency: 0, border: true, borderColor: { solid: { color: customization.colors.foregroundNeutralTertiary } } }],
+        outspacePane: [{ backgroundColor: { solid: { color: '#ffffff' } }, foregroundColor: { solid: { color: '#252423' } }, transparency: 0, border: true, borderColor: { solid: { color: '#c8C6C4' } } }],
         filterCard: [
-          { $id: 'Applied', transparency: 0, foregroundColor: { solid: { color: customization.colors.foreground } }, border: true },
-          { $id: 'Available', transparency: 0, foregroundColor: { solid: { color: customization.colors.foreground } }, border: true },
+          { $id: 'Applied', transparency: 0, backgroundColor: { solid: { color: '#ffffff' } }, foregroundColor: { solid: { color: '#252423' } }, border: true },
+          { $id: 'Available', transparency: 0, backgroundColor: { solid: { color: '#ffffff' } }, foregroundColor: { solid: { color: '#252423' } }, border: true },
         ],
       },
     },

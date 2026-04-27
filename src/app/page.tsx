@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useThemeStore } from '@/store/themeStore';
 import { TEMPLATES } from '@/store/templateStore';
-import { ThemeToggle } from '@/components/ThemeToggle';
+
 import styles from './home.module.css';
 
 export default function HomePage() {
@@ -36,7 +36,7 @@ export default function HomePage() {
           <span>Theme Studio</span>
         </div>
         <div className={styles.navRight}>
-          <ThemeToggle />
+
         </div>
       </nav>
 

@@ -149,12 +149,12 @@ export default function PowerBIEmbed({ themeJson, workspaceId, reportId }: Power
         accessToken: config.embedToken,
         embedUrl: config.embedUrl,
         id: config.reportId,
-        permissions: pbi.models.Permissions.Read,
+        permissions: pbi.models.Permissions.All,
         settings: {
-          filterPaneEnabled: false,
-          navContentPaneEnabled: false,
+          filterPaneEnabled: true,
+          navContentPaneEnabled: true,
           panes: {
-            filters: { visible: false },
+            filters: { visible: true },
             pageNavigation: { visible: true },
           },
           background: pbi.models.BackgroundType.Transparent,

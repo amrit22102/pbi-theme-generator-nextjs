@@ -6,9 +6,9 @@ import dynamic from 'next/dynamic';
 import { HexColorPicker } from 'react-colorful';
 import { useThemeStore } from '@/store/themeStore';
 import { TEMPLATES } from '@/store/templateStore';
-import { exportThemeJSON, exportPBIXPackage } from '@/lib/themeExporter';
+import { exportThemeJSON, exportPBIXPackage, exportLiveReportPBIX } from '@/lib/themeExporter';
 import { FONT_FAMILIES } from '@/types/theme';
-import { ThemeToggle } from '@/components/ThemeToggle';
+
 import styles from './live-preview.module.css';
 
 // Dynamic import — powerbi-client uses browser APIs, avoid SSR
@@ -300,6 +300,7 @@ export default function LivePreviewPage() {
     setForeground,
     setBackground,
     setPrimaryDataColor,
+    setSecondaryDataColor,
     setTextClass,
     applyTemplate,
     resetToDefault,
@@ -309,6 +310,19 @@ export default function LivePreviewPage() {
   const [showJsonPreview, setShowJsonPreview] = useState(false);
   const [pbixExporting, setPbixExporting] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+
+  // ─── Custom JSON Upload ───
+  const [customUploadedJson, setCustomUploadedJson] = useState<object | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ─── Canvas Background ───
+  const [canvasBgColor, setCanvasBgColor] = useState('#ffffff');
+  const [canvasBgImage, setCanvasBgImage] = useState<string | null>(null);
+  const [canvasBgImageName, setCanvasBgImageName] = useState('');
+  const [canvasBgFit, setCanvasBgFit] = useState<'cover' | 'contain' | 'fill' | 'none'>('cover');
+  const [canvasBgTransparency, setCanvasBgTransparency] = useState(0);
+  const canvasBgInputRef = useRef<HTMLInputElement>(null);
 
   // ─── Workspace & Report Selection ───
   const [workspaces, setWorkspaces] = useState<{ id: string; name: string }[]>([]);
@@ -371,13 +385,85 @@ export default function LivePreviewPage() {
 
   // Generate theme JSON — passed to PowerBIEmbed for real-time application
   const exportJSON = useMemo(() => {
-    return getExportJSON();
+    const base = getExportJSON() as Record<string, unknown>;
+
+    // Inject canvas background into visualStyles.page
+    const vs = base.visualStyles as Record<string, unknown> || {};
+    const pageBackground: Record<string, unknown> = {
+      color: { solid: { color: canvasBgColor } },
+      transparency: canvasBgTransparency,
+    };
+
+    // Add background image if one is uploaded (base64 data URL)
+    if (canvasBgImage) {
+      pageBackground.image = {
+        name: 'canvasBackground',
+        scaling: canvasBgFit === 'cover' ? 'Fill'
+          : canvasBgFit === 'contain' ? 'Fit'
+            : canvasBgFit === 'fill' ? 'Fill'
+              : 'Normal',
+        url: canvasBgImage,
+      };
+    }
+
+    vs.page = {
+      '*': {
+        outspace: [{ color: { solid: { color: canvasBgColor } } }],
+        background: [pageBackground],
+      },
+    };
+
+    base.visualStyles = vs;
+    return base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customization]);
+  }, [customization, canvasBgColor, canvasBgImage, canvasBgFit, canvasBgTransparency]);
+
+  // The effective theme: custom uploaded JSON takes priority
+  const effectiveThemeJson = customUploadedJson || exportJSON;
 
   const jsonStr = useMemo(() => {
-    return JSON.stringify(exportJSON, null, 2);
-  }, [exportJSON]);
+    return JSON.stringify(effectiveThemeJson, null, 2);
+  }, [effectiveThemeJson]);
+
+  // ─── File Upload Handler ───
+  const handleJsonUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.json')) {
+      showToast('error', 'Please upload a .json file');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target?.result as string);
+        if (typeof parsed !== 'object' || parsed === null) {
+          showToast('error', 'Invalid JSON: must be an object');
+          return;
+        }
+        setCustomUploadedJson(parsed);
+        setUploadedFileName(file.name);
+        showToast('success', `Theme "${file.name}" loaded — applying to report...`);
+      } catch {
+        showToast('error', 'Failed to parse JSON file. Check syntax.');
+      }
+    };
+    reader.onerror = () => {
+      showToast('error', 'Failed to read file');
+    };
+    reader.readAsText(file);
+
+    // Reset the input so re-uploading the same file triggers onChange
+    e.target.value = '';
+  }, []);
+
+  const clearUploadedJson = useCallback(() => {
+    setCustomUploadedJson(null);
+    setUploadedFileName('');
+    showToast('success', 'Custom theme removed — using editor theme');
+  }, []);
 
   const handleExport = () => {
     const json = getExportJSON();
@@ -392,12 +478,31 @@ export default function LivePreviewPage() {
   const handlePBIXExport = async () => {
     setPbixExporting(true);
     try {
-      const json = getExportJSON();
-      const result = await exportPBIXPackage(json, customization.name);
-      if (result.success) {
-        showToast('success', `PBIX "${customization.name}" exported with theme applied!`);
+      const themeToExport = effectiveThemeJson;
+      const name = (themeToExport as Record<string, unknown>).name as string || customization.name;
+
+      // If a live report is selected, download the actual report + inject theme
+      if (selectedWorkspaceId && selectedReportId) {
+        const result = await exportLiveReportPBIX(
+          themeToExport,
+          name,
+          selectedWorkspaceId,
+          selectedReportId,
+        );
+        if (result.success) {
+          showToast('success', `Report exported with theme "${name}" applied!`);
+        } else {
+          showToast('error', result.error || 'PBIX export failed');
+        }
       } else {
-        showToast('error', result.error || 'PBIX export failed');
+        // Fallback: no report selected, use template-based export
+        const json = getExportJSON();
+        const result = await exportPBIXPackage(json, customization.name);
+        if (result.success) {
+          showToast('success', `PBIX "${customization.name}" exported with theme applied!`);
+        } else {
+          showToast('error', result.error || 'PBIX export failed');
+        }
       }
     } catch {
       showToast('error', 'Unexpected error during PBIX export');
@@ -424,7 +529,7 @@ export default function LivePreviewPage() {
             <span>Theme Studio</span>
           </div>
           <div className={styles.sidebarHeaderActions}>
-            <ThemeToggle />
+
             <button className={styles.headerBtn} onClick={resetToDefault}>
               Reset
             </button>
@@ -491,31 +596,72 @@ export default function LivePreviewPage() {
           />
         </div>
 
-        {/* Template picker */}
-        <div className={styles.templateSection}>
-          <div className={styles.templateLabel}>Apply Template</div>
-          <select
-            className={styles.templateSelect}
-            value=""
-            onChange={(e) => handleTemplateChange(e.target.value)}
-            id="live-preview-template-select"
-          >
-            <option value="">Choose a template...</option>
-            {TEMPLATES.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name} — {t.category}
-              </option>
-            ))}
-          </select>
-        </div>
-
         <div className={styles.sidebarScroll}>
+          {/* ─── Apply Template ─── */}
+          <Panel emoji="📋" title="Apply Template">
+            <select
+              className={styles.templateSelect}
+              value=""
+              onChange={(e) => handleTemplateChange(e.target.value)}
+              id="live-preview-template-select"
+            >
+              <option value="">Choose a template...</option>
+              {TEMPLATES.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name} — {t.category}
+                </option>
+              ))}
+            </select>
+
+            {/* ─── Custom JSON Upload ─── */}
+            <div className={styles.uploadSection}>
+              <div className={styles.uploadDivider}>
+                <span>or</span>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={handleJsonUpload}
+                style={{ display: 'none' }}
+                id="live-preview-json-upload"
+              />
+              {customUploadedJson ? (
+                <div className={styles.uploadedFile}>
+                  <div className={styles.uploadedFileInfo}>
+                    <span className={styles.uploadedFileIcon}>📄</span>
+                    <span className={styles.uploadedFileName}>{uploadedFileName}</span>
+                  </div>
+                  <button
+                    className={styles.uploadedFileClear}
+                    onClick={clearUploadedJson}
+                    title="Remove custom theme"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className={styles.uploadBtn}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  📁 Upload Custom JSON
+                </button>
+              )}
+            </div>
+          </Panel>
+
           {/* ─── Data Colors ─── */}
-          <Panel emoji="🎨" title="Data Colors" defaultOpen>
+          <Panel emoji="🎨" title="Data Colors">
             <ColorPickerField
               label="Primary Data Color"
               color={customization.colors.dataColors[0]}
               onChange={setPrimaryDataColor}
+            />
+            <ColorPickerField
+              label="Secondary Data Color"
+              color={customization.colors.dataColors[1]}
+              onChange={setSecondaryDataColor}
             />
             <ColorPickerField
               label="Background Color"
@@ -541,7 +687,7 @@ export default function LivePreviewPage() {
                   color: 'var(--text-primary)',
                 }}
               >
-                Callout
+                KPI/Card Values
               </div>
               <div className={styles.fontRow}>
                 <div className={styles.fontLabel}>
@@ -595,7 +741,7 @@ export default function LivePreviewPage() {
                   color: 'var(--text-primary)',
                 }}
               >
-                Title
+                Visual Titles
               </div>
               <div className={styles.fontRow}>
                 <div className={styles.fontLabel}>
@@ -747,6 +893,107 @@ export default function LivePreviewPage() {
               />
             </div>
           </Panel>
+
+          {/* ─── Canvas Background ─── */}
+          <Panel emoji="🖼️" title="Canvas Background">
+            <div className={styles.canvasBgSection}>
+              <div className={styles.canvasBgField}>
+                <span className={styles.canvasBgLabel}>Color</span>
+                <ColorPickerField
+                  color={canvasBgColor}
+                  onChange={setCanvasBgColor}
+                />
+              </div>
+
+              <div className={styles.canvasBgField}>
+                <span className={styles.canvasBgLabel}>Image</span>
+                <input
+                  ref={canvasBgInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      setCanvasBgImage(ev.target?.result as string);
+                      setCanvasBgImageName(file.name);
+                    };
+                    reader.readAsDataURL(file);
+                    e.target.value = '';
+                  }}
+                  id="canvas-bg-image-upload"
+                />
+                {canvasBgImage ? (
+                  <div className={styles.canvasBgImagePreview}>
+                    <span className={styles.canvasBgImageName}>{canvasBgImageName}</span>
+                    <button
+                      className={styles.canvasBgImageClear}
+                      onClick={() => {
+                        setCanvasBgImage(null);
+                        setCanvasBgImageName('');
+                      }}
+                      title="Remove image"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className={styles.canvasBgBrowseBtn}
+                    onClick={() => canvasBgInputRef.current?.click()}
+                  >
+                    Browse...
+                  </button>
+                )}
+              </div>
+
+              <div className={styles.canvasBgField}>
+                <span className={styles.canvasBgLabel}>Image fit</span>
+                <select
+                  className={styles.canvasBgSelect}
+                  value={canvasBgFit}
+                  onChange={(e) => setCanvasBgFit(e.target.value as 'cover' | 'contain' | 'fill' | 'none')}
+                  id="canvas-bg-fit-select"
+                >
+                  <option value="cover">Fill</option>
+                  <option value="contain">Fit</option>
+                  <option value="fill">Stretch</option>
+                  <option value="none">Normal</option>
+                </select>
+              </div>
+
+              <div className={styles.canvasBgField}>
+                <span className={styles.canvasBgLabel}>Transparency</span>
+                <div className={styles.canvasBgTransparencyRow}>
+                  <span className={styles.canvasBgTransparencyValue}>{canvasBgTransparency} %</span>
+                  <input
+                    type="range"
+                    className={styles.slider}
+                    min={0}
+                    max={100}
+                    value={canvasBgTransparency}
+                    onChange={(e) => setCanvasBgTransparency(Number(e.target.value))}
+                    id="canvas-bg-transparency"
+                  />
+                </div>
+              </div>
+
+              <button
+                className={styles.canvasBgResetBtn}
+                onClick={() => {
+                  setCanvasBgColor('#ffffff');
+                  setCanvasBgImage(null);
+                  setCanvasBgImageName('');
+                  setCanvasBgFit('cover');
+                  setCanvasBgTransparency(0);
+                }}
+              >
+                ↺ Reset to default
+              </button>
+            </div>
+          </Panel>
         </div>
 
         {/* ─── Export ─── */}
@@ -798,12 +1045,35 @@ export default function LivePreviewPage() {
 
         {/* Report + optional JSON panel */}
         <div className={styles.reportContainer}>
-          <div className={styles.reportEmbed}>
-            <PowerBIEmbed
-              themeJson={exportJSON}
-              workspaceId={selectedWorkspaceId}
-              reportId={selectedReportId}
-            />
+          <div
+            className={styles.reportEmbed}
+            style={{
+              backgroundColor: canvasBgColor,
+              backgroundImage: canvasBgImage ? `url(${canvasBgImage})` : 'none',
+              backgroundSize: canvasBgFit === 'fill' ? '100% 100%' : canvasBgFit,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+            }}
+          >
+            {/* Transparency overlay */}
+            {canvasBgTransparency > 0 && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundColor: `rgba(255, 255, 255, ${canvasBgTransparency / 100})`,
+                  pointerEvents: 'none',
+                  zIndex: 1,
+                }}
+              />
+            )}
+            <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%' }}>
+              <PowerBIEmbed
+                themeJson={effectiveThemeJson}
+                workspaceId={selectedWorkspaceId}
+                reportId={selectedReportId}
+              />
+            </div>
           </div>
 
           {showJsonPreview && (

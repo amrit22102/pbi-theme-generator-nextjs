@@ -10,7 +10,7 @@ import {
   CHART_TYPE_LABELS,
   FONT_FAMILIES,
 } from '@/types/theme';
-import { ThemeToggle } from '@/components/ThemeToggle';
+
 import styles from './editor.module.css';
 
 /* ─── Color Picker Field ─── */
@@ -385,7 +385,7 @@ export default function EditorPage() {
             <span>Theme Studio</span>
           </div>
           <div className={styles.sidebarHeaderActions}>
-            <ThemeToggle />
+
             <button className={styles.headerBtn} onClick={resetToDefault}>
               Reset
             </button>

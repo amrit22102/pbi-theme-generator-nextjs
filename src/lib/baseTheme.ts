@@ -97,6 +97,11 @@ export const DEFAULT_CUSTOMIZATION: ThemeCustomization = {
     position: 'RightCenter',
     fontSize: 10,
   },
+  border: {
+    show: false,
+    color: '#B3B0AD',
+    width: 1,
+  },
   visualCustomizations: {
     scatterPlot: {
       bubbleSize: -10,
@@ -420,7 +425,7 @@ function buildVisualStyles(customization: ThemeCustomization, selectedCharts: Ch
         lineStyles: [{ strokeWidth: 3 }],
         wordWrap: [{ show: true }],
         background: [{ show: true, transparency: 0, color: { solid: { color: customization.colors.background } } }],
-        border: [{ width: 1 }],
+        border: [{ show: customization.border.show, color: { solid: { color: customization.border.color } }, width: customization.border.width }],
         outspacePane: [{ backgroundColor: { solid: { color: '#ffffff' } }, foregroundColor: { solid: { color: '#252423' } }, transparency: 0, border: true, borderColor: { solid: { color: '#c8C6C4' } } }],
         filterCard: [
           { $id: 'Applied', transparency: 0, backgroundColor: { solid: { color: '#ffffff' } }, foregroundColor: { solid: { color: '#252423' } }, border: true },
@@ -465,6 +470,19 @@ function buildVisualStyles(customization: ThemeCustomization, selectedCharts: Ch
           dataPointOverrides.fill2 = { solid: { color: secondaryColor } };
         }
         starSection.dataPoint = [dataPointOverrides];
+
+        // Pie/Donut use 'slices'
+        if (pbiKey === 'pieChart' || pbiKey === 'donutChart') {
+          starSection.slices = [dataPointOverrides];
+        }
+
+        // Waterfall uses 'sentimentColors'
+        if (pbiKey === 'waterfallChart') {
+          starSection.sentimentColors = [{
+            increase: { solid: { color: primaryColor } },
+            total: { solid: { color: secondaryColor || primaryColor } }
+          }];
+        }
       }
 
       // Inject font overrides into labels section

@@ -14,6 +14,8 @@ export default function MatrixTablePreview() {
   const c = customization.colors;
   const ff = customization.font.fontFamily;
   const fs = customization.font.fontSize;
+  const vc = customization.visualCustomizations?.matrixTable || {};
+  const primaryColor = vc.primaryColor || c.tableAccent;
 
   return (
     <div style={{ height: '100%', overflow: 'auto', fontFamily: `'${ff}', sans-serif` }}>
@@ -26,7 +28,7 @@ export default function MatrixTablePreview() {
                 textAlign: i === 0 ? 'left' : 'right',
                 fontWeight: 700,
                 color: c.foreground,
-                borderBottom: `2px solid ${c.tableAccent}`,
+                borderBottom: `2px solid ${primaryColor}`,
                 fontSize: fs,
                 whiteSpace: 'nowrap',
                 background: c.backgroundLight,

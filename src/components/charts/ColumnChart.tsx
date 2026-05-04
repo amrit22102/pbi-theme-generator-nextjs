@@ -15,8 +15,11 @@ const data = [
 export default function ColumnChartPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.columnChart || {};
   const tick = pbiAxisTick(customization);
   const gridDash = pbiGridlineDash(customization.xAxis.gridlineStyle);
+
+  const fillColor = vc.primaryColor || c.dataColors[0];
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -29,7 +32,7 @@ export default function ColumnChartPreview() {
           <YAxis tick={tick} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `${v / 1000}K` : v} />
         )}
         <Tooltip contentStyle={pbiTooltipStyle(customization)} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
-        <Bar dataKey="value" fill={c.dataColors[0]} radius={0} barSize={32} />
+        <Bar dataKey="value" fill={fillColor} radius={0} barSize={32} />
       </BarChart>
     </ResponsiveContainer>
   );

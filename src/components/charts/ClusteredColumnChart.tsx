@@ -13,8 +13,14 @@ const data = [
 export default function ClusteredColumnChartPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.clusteredColumnChart || {};
   const tick = pbiAxisTick(customization);
   const gridDash = pbiGridlineDash(customization.xAxis.gridlineStyle);
+
+  // Visual-level colors override global
+  const color0 = vc.primaryColor || c.dataColors[0];
+  const color1 = vc.secondaryColor || c.dataColors[1];
+  const color2 = c.dataColors[2];
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -24,9 +30,9 @@ export default function ClusteredColumnChartPreview() {
         {customization.yAxis.show && <YAxis tick={tick} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `${v / 1000}K` : v} />}
         <Tooltip contentStyle={pbiTooltipStyle(customization)} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
         {customization.legend.show && <Legend wrapperStyle={pbiLegendStyle(customization)} iconType="square" iconSize={10} />}
-        <Bar dataKey="Product" fill={c.dataColors[0]} radius={0} barSize={20} />
-        <Bar dataKey="Service" fill={c.dataColors[1]} radius={0} barSize={20} />
-        <Bar dataKey="Support" fill={c.dataColors[2]} radius={0} barSize={20} />
+        <Bar dataKey="Product" fill={color0} radius={0} barSize={20} />
+        <Bar dataKey="Service" fill={color1} radius={0} barSize={20} />
+        <Bar dataKey="Support" fill={color2} radius={0} barSize={20} />
       </BarChart>
     </ResponsiveContainer>
   );

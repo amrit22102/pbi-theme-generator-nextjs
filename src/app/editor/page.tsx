@@ -301,8 +301,11 @@ export default function EditorPage() {
     setForeground,
     setBackground,
     setPrimaryDataColor,
+    setSecondaryDataColor,
     setTextClass,
     setVisualConfig,
+    resetVisualConfig,
+    setBorder,
     selectVisual,
     resetToDefault,
     getExportJSON,
@@ -377,7 +380,7 @@ export default function EditorPage() {
 
   return (
     <div className={styles.editorLayout}>
-      {/* ─── Sidebar: Global Customizations Only ─── */}
+      {/* ─── Sidebar: Data Colors Only ─── */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <div className={styles.sidebarLogo} onClick={() => router.push('/')}>
@@ -405,13 +408,19 @@ export default function EditorPage() {
         </div>
 
         <div className={styles.sidebarScroll}>
-          {/* ─── Global Customizations ─── */}
-          <Panel emoji="🌍" title="Global Customizations" defaultOpen>
-            {/* Primary Data Color */}
+          {/* ─── Data Colors ─── */}
+          <Panel emoji="�" title="Data Colors" defaultOpen>
             <ColorPickerField
               label="Primary Data Color"
               color={customization.colors.dataColors[0]}
               onChange={setPrimaryDataColor}
+            />
+
+            {/* Secondary Data Color */}
+            <ColorPickerField
+              label="Secondary Data Color"
+              color={customization.colors.dataColors[1]}
+              onChange={setSecondaryDataColor}
             />
 
             {/* Background Color */}
@@ -427,12 +436,43 @@ export default function EditorPage() {
               color={customization.colors.foreground}
               onChange={setForeground}
             />
+          </Panel>
 
-            {/* Text Classes */}
-            <div style={{ marginTop: 16, borderTop: '1px solid var(--border-color)', paddingTop: 12 }}>
-              <h4 style={{ fontSize: 21, fontWeight: 600, marginBottom: 8, color: 'var(--text-primary)' }}>
-                Text Classes
-              </h4>
+          {/* ─── Border Settings ─── */}
+          <Panel emoji="🔳" title="Visual Borders">
+            <div className={styles.canvasBgSection}>
+              <div className={styles.toggleRow}>
+                <span className={styles.toggleLabel}>Show Border</span>
+                <div
+                  className={`${styles.toggle} ${customization.border.show ? styles.toggleActive : ''}`}
+                  onClick={() => setBorder({ show: !customization.border.show })}
+                  id="border-toggle"
+                />
+              </div>
+              <ColorPickerField
+                label="Border Color"
+                color={customization.border.color}
+                onChange={(c) => setBorder({ color: c })}
+              />
+              <div className={styles.canvasBgField}>
+                <span className={styles.canvasBgLabel}>Width ({customization.border.width}px)</span>
+                <div className={styles.canvasBgTransparencyRow}>
+                   <input
+                    type="range"
+                    className={styles.slider}
+                    min={0}
+                    max={10}
+                    value={customization.border.width}
+                    onChange={(e) => setBorder({ width: Number(e.target.value) })}
+                    id="border-width"
+                  />
+                </div>
+              </div>
+            </div>
+          </Panel>
+
+          {/* ─── Text Classes ─── */}
+          <Panel emoji="✏️" title="Text Classes">
 
               {/* Callout */}
               <div style={{ marginBottom: 12 }}>
@@ -604,7 +644,6 @@ export default function EditorPage() {
                   color={customization.textClasses.label.color}
                   onChange={(c) => setTextClass('label', { color: c })}
                 />
-              </div>
             </div>
           </Panel>
         </div>
@@ -717,6 +756,7 @@ export default function EditorPage() {
                 visual={selectedVisual}
                 customization={customization}
                 setVisualConfig={setVisualConfig}
+                resetVisualConfig={resetVisualConfig}
               />
             </div>
           </>
@@ -748,12 +788,15 @@ function VisualCustomizationPanel({
   visual,
   customization,
   setVisualConfig,
+  resetVisualConfig,
 }: {
   visual: ChartType;
   customization: any;
   setVisualConfig: (visual: ChartType, config: any) => void;
+  resetVisualConfig: (visual: ChartType) => void;
 }) {
   const visualConfig = customization.visualCustomizations[visual] || {};
+  const hasOverrides = Object.keys(visualConfig).length > 0;
 
   /* ── Common Appearance Controls ── */
   const renderAppearance = () => (
@@ -1036,6 +1079,40 @@ function VisualCustomizationPanel({
 
   return (
     <div style={{ backgroundColor: 'var(--bg-secondary)', padding: 24, borderRadius: 8 }}>
+      {/* Reset to Global button */}
+      {hasOverrides && (
+        <button
+          onClick={() => resetVisualConfig(visual)}
+          style={{
+            width: '100%',
+            padding: '8px 14px',
+            marginBottom: 16,
+            borderRadius: 6,
+            fontSize: 12,
+            fontWeight: 500,
+            color: '#1a3a5c',
+            background: 'rgba(26, 58, 92, 0.08)',
+            border: '1px dashed rgba(26, 58, 92, 0.3)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            transition: 'all 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(26, 58, 92, 0.14)';
+            (e.currentTarget as HTMLButtonElement).style.borderStyle = 'solid';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(26, 58, 92, 0.08)';
+            (e.currentTarget as HTMLButtonElement).style.borderStyle = 'dashed';
+          }}
+        >
+          ↺ Reset to Global Settings
+        </button>
+      )}
+
       {/* Common appearance controls */}
       {renderAppearance()}
 
@@ -1051,3 +1128,4 @@ function VisualCustomizationPanel({
     </div>
   );
 }
+

@@ -14,8 +14,11 @@ const data = [
 export default function BarChartPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.barChart || {};
   const tick = pbiAxisTick(customization);
   const gridDash = pbiGridlineDash(customization.yAxis.gridlineStyle);
+
+  const fillColor = vc.primaryColor || c.dataColors[0];
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -24,7 +27,7 @@ export default function BarChartPreview() {
         {customization.xAxis.show && <XAxis type="number" tick={tick} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `${v / 1000}K` : v} />}
         {customization.yAxis.show && <YAxis dataKey="name" type="category" tick={tick} axisLine={false} tickLine={false} width={72} />}
         <Tooltip contentStyle={pbiTooltipStyle(customization)} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
-        <Bar dataKey="value" fill={c.dataColors[2]} radius={0} barSize={22} />
+        <Bar dataKey="value" fill={fillColor} radius={0} barSize={22} />
       </BarChart>
     </ResponsiveContainer>
   );

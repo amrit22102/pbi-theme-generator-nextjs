@@ -11,6 +11,8 @@ export default function CardVisualPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
   const ff = customization.font.fontFamily;
+  const vc = customization.visualCustomizations?.cardVisual || {};
+  const primaryColor = vc.primaryColor || c.foreground;
 
   return (
     <div style={{
@@ -25,7 +27,7 @@ export default function CardVisualPreview() {
           <div style={{ fontSize: 11, color: c.foregroundNeutralSecondary, marginBottom: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
             {card.label}
           </div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: c.foreground, marginBottom: 6, letterSpacing: -0.5 }}>
+          <div style={{ fontSize: 28, fontWeight: 700, color: primaryColor, marginBottom: 6, letterSpacing: -0.5 }}>
             {card.value}
           </div>
           <div style={{ fontSize: 12, fontWeight: 600, color: card.up ? c.good : c.bad }}>

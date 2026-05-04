@@ -42,6 +42,11 @@ function CustomContent(props: ContentProps) {
 export default function TreemapPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.treemapChart || {};
+
+  const colors = [...c.dataColors];
+  if (vc.primaryColor) colors[0] = vc.primaryColor;
+  if (vc.secondaryColor) colors[1] = vc.secondaryColor;
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -50,7 +55,7 @@ export default function TreemapPreview() {
         dataKey="size"
         nameKey="name"
         stroke="none"
-        content={<CustomContent x={0} y={0} width={0} height={0} name="" index={0} colors={c.dataColors} />}
+        content={<CustomContent x={0} y={0} width={0} height={0} name="" index={0} colors={colors} />}
       >
         <Tooltip contentStyle={pbiTooltipStyle(customization)} />
       </Treemap>

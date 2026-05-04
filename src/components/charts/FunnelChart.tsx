@@ -12,8 +12,14 @@ const data = [
 export default function FunnelChartPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.funnelChart || {};
   const ff = customization.font.fontFamily;
   const max = data[0].value;
+
+  // Build colors with visual overrides
+  const colors = [...c.dataColors];
+  if (vc.primaryColor) colors[0] = vc.primaryColor;
+  if (vc.secondaryColor) colors[1] = vc.secondaryColor;
 
   return (
     <div style={{
@@ -34,7 +40,7 @@ export default function FunnelChartPreview() {
             <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
               <div style={{
                 width: `${pct}%`, height: 32,
-                background: c.dataColors[i % c.dataColors.length],
+                background: colors[i % colors.length],
                 display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 60,
               }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>

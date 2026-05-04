@@ -1,7 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
-import { ThemeCustomization, AxisConfig, LegendConfig, ChartType, TextClass, VisualConfig } from '@/types/theme';
+import { ThemeCustomization, AxisConfig, LegendConfig, BorderConfig, ChartType, TextClass, VisualConfig } from '@/types/theme';
 import { DEFAULT_CUSTOMIZATION, buildExportJSON } from '@/lib/baseTheme';
 
 interface ThemeState {
@@ -23,9 +23,11 @@ interface ThemeState {
   setFont: (font: Partial<ThemeCustomization['font']>) => void;
   setTextClass: (textClass: 'callout' | 'title' | 'header' | 'label', config: Partial<TextClass>) => void;
   setVisualConfig: (visual: ChartType, config: Partial<VisualConfig>) => void;
+  resetVisualConfig: (visual: ChartType) => void;
   setXAxis: (config: Partial<AxisConfig>) => void;
   setYAxis: (config: Partial<AxisConfig>) => void;
   setLegend: (config: Partial<LegendConfig>) => void;
+  setBorder: (config: Partial<BorderConfig>) => void;
   selectVisual: (visual: ChartType | null) => void;
   applyTemplate: (customization: ThemeCustomization) => void;
   resetToDefault: () => void;
@@ -161,6 +163,18 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       },
     })),
 
+  resetVisualConfig: (visual) =>
+    set((s) => {
+      const updated = { ...s.customization.visualCustomizations };
+      delete updated[visual];
+      return {
+        customization: {
+          ...s.customization,
+          visualCustomizations: updated,
+        },
+      };
+    }),
+
   setXAxis: (config) =>
     set((s) => ({
       customization: {
@@ -182,6 +196,14 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
       customization: {
         ...s.customization,
         legend: { ...s.customization.legend, ...config },
+      },
+    })),
+
+  setBorder: (config) =>
+    set((s) => ({
+      customization: {
+        ...s.customization,
+        border: { ...s.customization.border, ...config },
       },
     })),
 

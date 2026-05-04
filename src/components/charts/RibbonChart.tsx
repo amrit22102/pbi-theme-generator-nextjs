@@ -14,8 +14,13 @@ const data = [
 export default function RibbonChartPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.ribbonChart || {};
   const tick = pbiAxisTick(customization);
   const gridDash = pbiGridlineDash(customization.xAxis.gridlineStyle);
+
+  const color0 = vc.primaryColor || c.dataColors[0];
+  const color1 = vc.secondaryColor || c.dataColors[1];
+  const color2 = c.dataColors[2];
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -25,9 +30,9 @@ export default function RibbonChartPreview() {
         {customization.yAxis.show && <YAxis tick={tick} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `${v / 1000}K` : v} />}
         <Tooltip contentStyle={pbiTooltipStyle(customization)} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
         {customization.legend.show && <Legend wrapperStyle={pbiLegendStyle(customization)} iconType="square" iconSize={10} />}
-        <Bar dataKey="Marketing" stackId="a" fill={c.dataColors[4]} radius={0} />
-        <Bar dataKey="Sales" stackId="a" fill={c.dataColors[5]} radius={0} />
-        <Bar dataKey="Support" stackId="a" fill={c.dataColors[6]} radius={0} />
+        <Bar dataKey="Marketing" stackId="a" fill={color0} radius={0} />
+        <Bar dataKey="Sales" stackId="a" fill={color1} radius={0} />
+        <Bar dataKey="Support" stackId="a" fill={color2} radius={0} />
       </BarChart>
     </ResponsiveContainer>
   );

@@ -333,6 +333,14 @@
   gap: 4px;
 }
 
+.canvasBgColorField {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+
 .canvasBgLabel {
   font-size: 12px;
   font-weight: 600;
@@ -732,8 +740,15 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .headerActions {
@@ -966,4 +981,52 @@
 .statusDotLoading {
   background: var(--color-orange-dark);
   animation: pulse 1s ease-in-out infinite;
+}
+
+/* ─── Toggle Switch ─── */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  margin-bottom: 4px;
+}
+
+.toggleLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: #e0e0e0;
+  border: 2px solid transparent;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggleActive {
+  background: #1a3a5c;
+}
+
+.toggleActive::after {
+  left: 23px;
+  background: #ffffff;
 }

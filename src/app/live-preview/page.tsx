@@ -302,6 +302,7 @@ export default function LivePreviewPage() {
     setPrimaryDataColor,
     setSecondaryDataColor,
     setTextClass,
+    setBorder,
     applyTemplate,
     resetToDefault,
     getExportJSON,
@@ -675,6 +676,39 @@ export default function LivePreviewPage() {
             />
           </Panel>
 
+          {/* ─── Visual Borders ─── */}
+          <Panel emoji="🔳" title="Visual Borders">
+            <div className={styles.canvasBgSection}>
+              <div className={styles.toggleRow}>
+                <span className={styles.toggleLabel}>Show Border</span>
+                <div
+                  className={`${styles.toggle} ${customization.border.show ? styles.toggleActive : ''}`}
+                  onClick={() => setBorder({ show: !customization.border.show })}
+                  id="live-border-toggle"
+                />
+              </div>
+              <ColorPickerField
+                label="Border Color"
+                color={customization.border.color}
+                onChange={(c) => setBorder({ color: c })}
+              />
+              <div className={styles.canvasBgField}>
+                <span className={styles.canvasBgLabel}>Width ({customization.border.width}px)</span>
+                <div className={styles.canvasBgTransparencyRow}>
+                   <input
+                    type="range"
+                    className={styles.slider}
+                    min={0}
+                    max={10}
+                    value={customization.border.width}
+                    onChange={(e) => setBorder({ width: Number(e.target.value) })}
+                    id="live-border-width"
+                  />
+                </div>
+              </div>
+            </div>
+          </Panel>
+
           {/* ─── Text Classes ─── */}
           <Panel emoji="✏️" title="Text Classes">
             {/* Callout */}
@@ -897,7 +931,7 @@ export default function LivePreviewPage() {
           {/* ─── Canvas Background ─── */}
           <Panel emoji="🖼️" title="Canvas Background">
             <div className={styles.canvasBgSection}>
-              <div className={styles.canvasBgField}>
+              <div className={styles.canvasBgColorField}>
                 <span className={styles.canvasBgLabel}>Color</span>
                 <ColorPickerField
                   color={canvasBgColor}

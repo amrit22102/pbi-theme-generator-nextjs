@@ -15,8 +15,12 @@ const data = [
 export default function WaterfallChartPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.waterfallChart || {};
   const tick = pbiAxisTick(customization);
   const gridDash = pbiGridlineDash(customization.xAxis.gridlineStyle);
+
+  const positiveColor = vc.primaryColor || c.dataColors[0];
+  const totalColor = vc.secondaryColor || c.dataColors[1];
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -28,7 +32,7 @@ export default function WaterfallChartPreview() {
         <ReferenceLine y={0} stroke={c.foregroundNeutralTertiary} strokeWidth={1} />
         <Bar dataKey="value" radius={0} barSize={32}>
           {data.map((entry, i) => (
-            <Cell key={i} fill={i === 0 || i === data.length - 1 ? c.dataColors[4] : entry.value >= 0 ? c.dataColors[0] : c.bad} />
+            <Cell key={i} fill={i === 0 || i === data.length - 1 ? totalColor : entry.value >= 0 ? positiveColor : c.bad} />
           ))}
         </Bar>
       </BarChart>

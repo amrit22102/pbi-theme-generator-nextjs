@@ -16,23 +16,26 @@ const data = [
 export default function AreaChartPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.areaChart || {};
   const tick = pbiAxisTick(customization);
   const gridDash = pbiGridlineDash(customization.xAxis.gridlineStyle);
+
+  const color0 = vc.primaryColor || c.dataColors[0];
 
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart data={data} margin={{ top: 8, right: 16, left: -8, bottom: 4 }}>
         <defs>
           <linearGradient id="pbiAreaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={c.dataColors[0]} stopOpacity={0.35} />
-            <stop offset="100%" stopColor={c.dataColors[0]} stopOpacity={0.05} />
+            <stop offset="0%" stopColor={color0} stopOpacity={0.35} />
+            <stop offset="100%" stopColor={color0} stopOpacity={0.05} />
           </linearGradient>
         </defs>
         <CartesianGrid stroke={customization.yAxis.gridlineColor} strokeDasharray={gridDash} vertical={false} />
         {customization.xAxis.show && <XAxis dataKey="name" tick={tick} axisLine={{ stroke: c.foregroundNeutralTertiary }} tickLine={false} />}
         {customization.yAxis.show && <YAxis tick={tick} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `${v / 1000}K` : v} />}
         <Tooltip contentStyle={pbiTooltipStyle(customization)} />
-        <Area type="linear" dataKey="value" stroke={c.dataColors[0]} strokeWidth={2} fill="url(#pbiAreaGrad)" dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: c.dataColors[0] }} />
+        <Area type="linear" dataKey="value" stroke={color0} strokeWidth={2} fill="url(#pbiAreaGrad)" dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: color0 }} />
       </AreaChart>
     </ResponsiveContainer>
   );

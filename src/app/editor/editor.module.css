@@ -8,8 +8,8 @@
 
 /* ─── Sidebar ─── */
 .sidebar {
-  width: 360px;
-  min-width: 360px;
+  width: 320px;
+  min-width: 320px;
   height: 100vh;
   background: #ffffff;
   border-right: 2px solid #d0ccc4;
@@ -86,6 +86,7 @@
   flex: 1;
   overflow-y: auto;
   padding: 4px 0;
+  /* Match live-preview for compactness */
 }
 
 /* ─── Theme Name ─── */
@@ -120,13 +121,13 @@
 
 /* ─── Accordion Panel (M3 elevated cards) ─── */
 .panel {
-  margin: 4px 12px;
+  margin: 4px 8px;
   border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
 .panelHeader {
-  padding: 14px 16px;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -168,7 +169,7 @@
 }
 
 .panelBody {
-  padding: 4px 16px 16px;
+  padding: 4px 10px 10px;
   animation: fadeIn 0.15s ease-out;
 }
 
@@ -248,16 +249,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
 .colorRowLabel {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-secondary);
 }
 
 .colorRowSwatch {
-  width: 36px; height: 36px;
+  width: 28px; height: 28px;
   border-radius: var(--radius-full);
   cursor: pointer;
   border: 2px solid var(--border-default);
@@ -271,29 +272,29 @@
 
 /* ─── Font Customizer ─── */
 .fontRow {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .fontLabel {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-secondary);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-weight: 500;
 }
 
 .fontSelect {
   width: 100%;
-  padding: 12px 14px;
+  padding: 8px 10px;
   border-radius: var(--radius-xs);
   background: var(--md-surface-container-low);
   border: 1px solid var(--border-default);
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235f6368' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 14px center;
+  background-position: right 10px center;
   transition: border-color var(--transition-fast);
 }
 
@@ -340,49 +341,52 @@
   text-align: center;
 }
 
-/* ─── Toggle Row (M3 Switch) ─── */
+/* ─── Toggle Switch ─── */
 .toggleRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 8px 0;
+  margin-bottom: 4px;
 }
 
 .toggleLabel {
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--text-secondary);
 }
 
 .toggle {
-  width: 52px; height: 32px;
-  border-radius: 16px;
-  background: var(--md-surface-container-highest);
-  border: 2px solid var(--md-outline);
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: #e0e0e0;
+  border: 2px solid transparent;
   position: relative;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.2s ease;
 }
 
 .toggle::after {
   content: '';
   position: absolute;
-  top: 6px; left: 6px;
-  width: 16px; height: 16px;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: var(--md-outline);
-  transition: all var(--transition-base);
+  background: #ffffff;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .toggleActive {
-  background: var(--md-primary);
-  border-color: var(--md-primary);
+  background: #1a3a5c;
 }
 
 .toggleActive::after {
-  left: 26px;
-  width: 20px; height: 20px;
-  top: 4px;
-  background: var(--md-on-primary);
+  left: 23px;
+  background: #ffffff;
 }
 
 /* ─── Export Panel ─── */
@@ -859,6 +863,38 @@
   font-size: 11px;
   color: var(--text-tertiary);
   font-family: 'Google Sans Mono', 'Roboto Mono', monospace;
+}
+
+/* ─── Canvas / Visual Border Fields ─── */
+.canvasBgSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.canvasBgField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.canvasBgColorField {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.canvasBgLabel {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.canvasBgTransparencyRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 /* ─── Main panel header bar ─── */

@@ -16,8 +16,13 @@ const data = [
 export default function LineChartPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.lineChart || {};
   const tick = pbiAxisTick(customization);
   const gridDash = pbiGridlineDash(customization.xAxis.gridlineStyle);
+
+  const color0 = vc.primaryColor || c.dataColors[0];
+  const color1 = vc.secondaryColor || c.dataColors[1];
+  const color2 = c.dataColors[2];
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -27,9 +32,9 @@ export default function LineChartPreview() {
         {customization.yAxis.show && <YAxis tick={tick} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `${v / 1000}K` : v} />}
         <Tooltip contentStyle={pbiTooltipStyle(customization)} />
         {customization.legend.show && <Legend wrapperStyle={pbiLegendStyle(customization)} iconType="plainline" iconSize={16} />}
-        <Line type="linear" dataKey="Revenue" stroke={c.dataColors[0]} strokeWidth={2.5} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} />
-        <Line type="linear" dataKey="Costs" stroke={c.dataColors[1]} strokeWidth={2.5} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} />
-        <Line type="linear" dataKey="Profit" stroke={c.dataColors[2]} strokeWidth={2.5} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} />
+        <Line type="linear" dataKey="Revenue" stroke={color0} strokeWidth={2.5} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} />
+        <Line type="linear" dataKey="Costs" stroke={color1} strokeWidth={2.5} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} />
+        <Line type="linear" dataKey="Profit" stroke={color2} strokeWidth={2.5} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} />
       </LineChart>
     </ResponsiveContainer>
   );

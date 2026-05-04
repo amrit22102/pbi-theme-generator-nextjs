@@ -15,8 +15,13 @@ const data = [
 export default function StackedAreaChartPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.stackedAreaChart || {};
   const tick = pbiAxisTick(customization);
   const gridDash = pbiGridlineDash(customization.xAxis.gridlineStyle);
+
+  const color0 = vc.primaryColor || c.dataColors[0];
+  const color1 = vc.secondaryColor || c.dataColors[1];
+  const color2 = c.dataColors[2];
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -26,9 +31,9 @@ export default function StackedAreaChartPreview() {
         {customization.yAxis.show && <YAxis tick={tick} axisLine={false} tickLine={false} tickFormatter={(v) => v >= 1000 ? `${v / 1000}K` : v} />}
         <Tooltip contentStyle={pbiTooltipStyle(customization)} />
         {customization.legend.show && <Legend wrapperStyle={pbiLegendStyle(customization)} iconType="square" iconSize={10} />}
-        <Area type="linear" dataKey="Online" stackId="1" stroke={c.dataColors[0]} fill={c.dataColors[0]} fillOpacity={0.7} />
-        <Area type="linear" dataKey="Store" stackId="1" stroke={c.dataColors[1]} fill={c.dataColors[1]} fillOpacity={0.7} />
-        <Area type="linear" dataKey="Wholesale" stackId="1" stroke={c.dataColors[2]} fill={c.dataColors[2]} fillOpacity={0.7} />
+        <Area type="linear" dataKey="Online" stackId="1" stroke={color0} fill={color0} fillOpacity={0.7} />
+        <Area type="linear" dataKey="Store" stackId="1" stroke={color1} fill={color1} fillOpacity={0.7} />
+        <Area type="linear" dataKey="Wholesale" stackId="1" stroke={color2} fill={color2} fillOpacity={0.7} />
       </AreaChart>
     </ResponsiveContainer>
   );

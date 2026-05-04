@@ -13,8 +13,11 @@ const data = [
 export default function ScatterPlotPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.scatterPlot || {};
   const tick = pbiAxisTick(customization);
   const gridDash = pbiGridlineDash(customization.xAxis.gridlineStyle);
+
+  const fillColor = vc.primaryColor || c.dataColors[0];
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -24,7 +27,7 @@ export default function ScatterPlotPreview() {
         {customization.yAxis.show && <YAxis dataKey="y" type="number" tick={tick} axisLine={false} tickLine={false} name="Y" />}
         <ZAxis range={[40, 40]} />
         <Tooltip contentStyle={pbiTooltipStyle(customization)} cursor={{ strokeDasharray: '3 3', stroke: '#ccc' }} />
-        <Scatter data={data} fill={c.dataColors[3]} fillOpacity={0.75} />
+        <Scatter data={data} fill={fillColor} fillOpacity={0.75} />
       </ScatterChart>
     </ResponsiveContainer>
   );

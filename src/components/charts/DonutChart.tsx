@@ -14,13 +14,18 @@ const data = [
 export default function DonutChartPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.donutChart || {};
+
+  const colors = [...c.dataColors];
+  if (vc.primaryColor) colors[0] = vc.primaryColor;
+  if (vc.secondaryColor) colors[1] = vc.secondaryColor;
 
   return (
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
         <Pie data={data} cx="50%" cy="48%" innerRadius={52} outerRadius={85} dataKey="value" strokeWidth={2} stroke="#ffffff">
           {data.map((_, i) => (
-            <Cell key={i} fill={c.dataColors[i % c.dataColors.length]} />
+            <Cell key={i} fill={colors[i % colors.length]} />
           ))}
         </Pie>
         <Tooltip contentStyle={pbiTooltipStyle(customization)} />

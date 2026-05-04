@@ -33,6 +33,12 @@ export interface LegendConfig {
   fontSize: number;
 }
 
+export interface BorderConfig {
+  show: boolean;
+  color: string;
+  width: number;
+}
+
 export interface ThemeColors {
   dataColors: string[];
   foreground: string;
@@ -64,6 +70,7 @@ export interface ThemeCustomization {
   xAxis: AxisConfig;
   yAxis: AxisConfig;
   legend: LegendConfig;
+  border: BorderConfig;
   visualCustomizations: VisualCustomizations;
 }
 

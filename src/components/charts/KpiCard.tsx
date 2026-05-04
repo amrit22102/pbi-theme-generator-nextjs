@@ -4,7 +4,10 @@ import { useThemeStore } from '@/store/themeStore';
 export default function KpiCardPreview() {
   const { customization } = useThemeStore();
   const c = customization.colors;
+  const vc = customization.visualCustomizations?.kpiCard || {};
   const ff = customization.font.fontFamily;
+
+  const barColor = vc.primaryColor || c.dataColors[0];
 
   return (
     <div style={{
@@ -23,7 +26,7 @@ export default function KpiCardPreview() {
         <span style={{ fontSize: 12, color: c.foregroundNeutralTertiary }}>vs Target</span>
       </div>
       <div style={{ width: '100%', height: 6, borderRadius: 3, background: c.backgroundLight, overflow: 'hidden', marginTop: 16 }}>
-        <div style={{ width: '78%', height: '100%', borderRadius: 3, background: c.dataColors[0] }} />
+        <div style={{ width: '78%', height: '100%', borderRadius: 3, background: barColor }} />
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop: 6 }}>
         <span style={{ fontSize: 11, color: c.foregroundNeutralTertiary }}>Actual: $142K</span>
